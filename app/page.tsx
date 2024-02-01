@@ -18,7 +18,6 @@ export default function Home() {
 
     const apiKey = inputAPIKeyRef.current.value;
 
-
     const openai = new OpenAI({
       apiKey: apiKey, dangerouslyAllowBrowser: true
     });
@@ -33,15 +32,15 @@ export default function Home() {
           {
             role: 'user',
             content: query,
-            temperature: 0,
-            max_tokens: 500,
-            top_p: 1.0,
-            frequency_penalty: 0.0,
-            presence_penalty: 0.0,
+            // temperature: 0,
+            // max_tokens: 500,
+            // top_p: 1.0,
+            // frequency_penalty: 0.0,
+            // presence_penalty: 0.0,
           }]
       });
 
-      setChatGPTAnswer(response.data.choices[0].message);
+      setChatGPTAnswer(response.choices[0].message.content);
     } catch (error) {
       console.log(error);
     }
@@ -53,11 +52,11 @@ export default function Home() {
       <div className={styles.main}>
         <div className={styles.label}>
           <label htmlFor='api-key'>API Key</label>
-          <input id="api-key" ref={inputAPIKeyRef} type="text" value="" />
+          <input id="api-key" ref={inputAPIKeyRef} type="text" />
         </div>
         <div className={styles.label}>
           <label htmlFor='query'>Query</label>
-          <input id="query" ref={queryRef} type="text" value="Chi e' il presidente degli stati uniti?" />
+          <input id="query" ref={queryRef} type="text" defaultValue="Chi e' il presidente degli stati uniti?" />
         </div>
         <div><button onClick={handleSendToAI} >Go</button></div>
         <div>{chatGPTAnswer}</div>
