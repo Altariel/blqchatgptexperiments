@@ -1,8 +1,6 @@
-'use client';
-
 import React from "react";
 import { OpenAI } from "openai";
-import styles from './page.module.css'
+import styles from './index.module.css'
 
 export default function Audio() {
   const inputAPIKeyRef = React.useRef<HTMLInputElement>(null);

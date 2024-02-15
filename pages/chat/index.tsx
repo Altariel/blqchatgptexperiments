@@ -1,7 +1,5 @@
-'use client'
-
 import { OpenAI } from "openai";
-import styles from './page.module.css'
+import styles from './index.module.css'
 import React from 'react';
 
 export default function Chat() {
