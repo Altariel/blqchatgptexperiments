@@ -46,7 +46,7 @@ export default function Chat() {
   return (
     <div className={styles.main}>
       <h1>Chat</h1>
-      <div> model: "gpt-3.5-turbo"</div>
+      <div>model: gpt-3.5-turbo</div>
       <form>
         <div className={styles.label}>
           <label htmlFor='api-key'>API Key</label>
