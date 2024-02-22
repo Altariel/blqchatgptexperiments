@@ -1,4 +1,4 @@
-export OPENAI_API_KEY=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
+export OPENAI_API_KEY=""
 
 curl --request POST \
   --url https://api.openai.com/v1/audio/transcriptions \
