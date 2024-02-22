@@ -7,9 +7,4 @@ transcript = client.audio.transcriptions.create(
   file=audio_file
 )
 
-transcript = client.transcriptions.create(
-  model="whisper-1", 
-  file=audio_file
-)
-
 print(transcript)

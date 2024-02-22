@@ -10,10 +10,12 @@
   },
   "dependencies": {
     "@fontsource/roboto": "^5.0.8",
+    "classnames": "^2.5.1",
     "next": "14.1.0",
     "openai": "^4.24.7",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "typeface-roboto": "^1.1.13"
   },
   "devDependencies": {
     "@types/node": "^20",
