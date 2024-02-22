@@ -4,6 +4,7 @@ import styles from './index.module.css'
 
 export default function Audio() {
   const inputAPIKeyRef = React.useRef<HTMLInputElement>(null);
+  const [chatGPTAnswer, setChatGPTAnswer] = React.useState<string>("");
 
   function onFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -33,14 +34,14 @@ export default function Audio() {
         // const response = await openai.createChatCompletion({
         const response = await openai.audio.transcriptions.create({
           file: file,
-          model: model,
+          model: 'whisper-1',
           language: "it",
           response_format: "verbose_json",
         });
 
-        console.log(response);
+        setChatGPTAnswer(response.text);
       } catch (error) {
-        console.log(error);
+        setChatGPTAnswer("Error: No answer." + error);
       }
     };
     reader.readAsDataURL(file);
@@ -56,5 +57,6 @@ export default function Audio() {
       <label htmlFor='audiofile'>File</label>
       <input id="audiofile" type="file" accept="audio/*" onChange={onFileChange} />
     </div>
+    <div>{chatGPTAnswer}</div>
   </div>
 }
