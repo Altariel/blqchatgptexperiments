@@ -1,14 +1,41 @@
+.h1 {
+  text-align: center;
+  font-size: 36px;
+  margin-bottom: 24px;
+}
+
 .main {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   gap: 10px;
   padding: 6rem;
   min-height: 100vh;
 }
 
-.label {
-  gap: 10px;
+.bigButton {
+  border-radius: 10px;
+  border: solid 1px black;
+  height: 144px;
   display: flex;
-  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.bigButton:hover {
+  border: solid 2px rgba(0, 0, 255, 0.2);
+  box-shadow: 4px 4px 2px 1px rgba(0, 0, 255, 0.2);
+}
+
+.bigButtonChat {
+  background-color: red;
+}
+
+.bigButtonTranscribe {
+  background-color: violet;
+}
+
+.bigButtonGenerate {
+  background-color: green;
 }
