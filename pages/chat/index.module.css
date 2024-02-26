@@ -21,3 +21,21 @@
   border-radius: 5px;
   border: 1px solid #000;
 }
+
+.wrapForm {
+   
+  justify-content: "center";
+  width: "95%";
+  margin-left: auto;
+ 
+}
+
+.wrapText {
+  width: "100%";
+}
+
+.container {
+  display: "flex";
+  align-content: flex-end;
+ min-height: 100%;
+}
