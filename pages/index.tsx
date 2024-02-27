@@ -1,17 +1,25 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect } from "react";
 import Link from "next/link";
 import classes from "./index.module.css";
 import classNames from "classnames";
 import { useRouter } from "next/router";
 import SettingsIcon from '@mui/icons-material/Settings';
 import { ApiKeyDialog } from "@/components/apikeydialog";
+import { getAPIKey, setAPIKey } from "../lib/apikeyprovider";
 
 export default function HomePage() {
     const [settingsDialogVisible, setSettingsDialogVisible] = React.useState(false);
+    const [apiKeyValue, setApiKeyValue] = React.useState("");
     const router = useRouter();
 
     function showSettingsHandler() {
         setSettingsDialogVisible(true);
+    }
+
+    function hideSettingsHandler(newKey: string) {
+        setSettingsDialogVisible(false); 
+        setAPIKey(newKey);
+        setApiKeyValue(newKey);
     }
 
     function handleClickChat() {
@@ -26,20 +34,26 @@ export default function HomePage() {
         router.push("/generate");
     }
 
+    useEffect(() => {
+        setApiKeyValue(getAPIKey() || "");
+    }, []);
+
+    const apiKeyExists = apiKeyValue.length > 0;
+
     return <div className={classes.main}>
-        <ApiKeyDialog open={settingsDialogVisible} onClose={() => { setSettingsDialogVisible(false) }} currentKey="" />
+        <ApiKeyDialog open={settingsDialogVisible} onClose={hideSettingsHandler} currentKey={apiKeyValue} />
         <h1 className={classes.h1}>AI Aiutami tu</h1>
         <div className={classes.icon} onClick={showSettingsHandler}>
             <SettingsIcon />
         </div>
-        <div className={classNames(classes.bigButton, classes.bigButtonChat)} onClick={handleClickChat}>
+        <button className={classNames(classes.bigButton, classes.bigButtonChat)} onClick={handleClickChat} disabled={!apiKeyExists}>
             Chat
-        </div>
-        <div className={classNames(classes.bigButton, classes.bigButtonTranscribe)} onClick={handleClickTranscribe}>
+        </button>
+        <button className={classNames(classes.bigButton, classes.bigButtonTranscribe)} onClick={handleClickTranscribe} disabled={!apiKeyExists}>
             Audio
-        </div>
-        <div className={classNames(classes.bigButton, classes.bigButtonGenerate)} onClick={handleClickGenerate}>
+        </button>
+        <button className={classNames(classes.bigButton, classes.bigButtonGenerate)} onClick={handleClickGenerate} disabled={!apiKeyExists}>
             Generate
-        </div>
+        </button>
     </div>
 }
