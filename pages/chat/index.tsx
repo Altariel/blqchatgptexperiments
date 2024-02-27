@@ -1,16 +1,13 @@
-import { OpenAI } from "openai";
-import styles from './index.module.css'
-import React from 'react';
 import Button from '@mui/material/Button';
+import { OpenAI } from "openai";
+import React from 'react';
+import styles from './index.module.css';
 
-import TextField from '@mui/material/TextField';
-import { createStyles, makeStyles, Theme } from "@mui/material/styles";
-import SendIcon from '@mui/icons-material/Send';
-import classes from './page.module.css'
-import { Box, Container, Grid, Paper, Typography } from '@mui/material';
-import { Message } from '@mui/icons-material';
-import { Sender, SentMessage } from '@/types/chattypes';
 import ChatMessage from '@/components/chatmessage';
+import { Sender, SentMessage } from '@/types/chattypes';
+import SendIcon from '@mui/icons-material/Send';
+import { Box, Grid } from '@mui/material';
+import TextField from '@mui/material/TextField';
 
 export default function Chat() {
   const inputAPIKeyRef = React.useRef<HTMLInputElement>(null);
