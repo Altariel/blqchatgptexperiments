@@ -41,7 +41,7 @@ export default function HomePage() {
     const apiKeyExists = apiKeyValue.length > 0;
 
     return <div className={classes.main}>
-        <ApiKeyDialog open={settingsDialogVisible} onClose={hideSettingsHandler} currentKey={apiKeyValue} />
+        {settingsDialogVisible && <ApiKeyDialog open={settingsDialogVisible} onClose={hideSettingsHandler} currentKey={apiKeyValue} />}
         <h1 className={classes.h1}>AI Aiutami tu</h1>
         <div className={classes.icon} onClick={showSettingsHandler}>
             <SettingsIcon />
