@@ -1,7 +1,7 @@
 import React from "react";
 import { OpenAI } from "openai";
 import styles from './index.module.css'
-import { transcribe } from "@/lib/openai-utils";
+import { isOpenApiError, transcribe } from "@/lib/openai-utils";
 
 export default function Audio() {
   const inputAPIKeyRef = React.useRef<HTMLInputElement>(null);
@@ -24,7 +24,10 @@ export default function Audio() {
         return;
       }
 
-      setChatGPTAnswer(await transcribe(inputAPIKeyRef.current.value, file));
+      const response = await transcribe(inputAPIKeyRef.current.value, file);
+      if (!isOpenApiError(response)) {
+        setChatGPTAnswer(response);
+      }
     };
     reader.readAsDataURL(file);
   }

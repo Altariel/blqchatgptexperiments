@@ -1,25 +1,32 @@
+/* eslint-disable @next/next/no-img-element */
 import React, { useRef } from "react";
 import classes from "./index.module.css";
 import { getAPIKey } from "@/lib/apikeyprovider";
+import { generate, isOpenApiError } from "@/lib/openai-utils";
 
 export default function Generate() {
-    const input = useRef<HTMLInputElement>(null);
+    const textarea = useRef<HTMLTextAreaElement>(null);
+    const [generatedImage, setGeneratedImage] = React.useState<string>("");
+    const [errorMessage, setErrorMessage] = React.useState<string>("");
 
-    function generateHandler(e: React.MouseEvent<HTMLButtonElement>) {
+    async function generateHandler(e: React.MouseEvent<HTMLButtonElement>) {
         const apikey = getAPIKey();
-        const response = await openai.createImage({
-            model: "dall-e-3",
-            prompt: "a white siamese cat",
-            n: 1,
-            size: "1024x1024",
-          });
-          image_url = response.data.data[0].url;
+        const description = textarea.current?.value;
+        if (description && apikey) {
+            const response = await generate(apikey, description);
+            if (!isOpenApiError(response)) {
+                setGeneratedImage(response.b64_json);
+            } else {
+                setErrorMessage(response.message);
+            }
+        }
     }
 
-
-    return <div>
-        <div className={classes.container}>Generate</div>
-        <input type="text" className={classes.input} placeholder="Enter the image description here" />
+    return <div className={classes.container}>
+        <h1>Generate</h1>
         <button className={classes.button} onClick={generateHandler}>Generate</button>
+        <textarea className={classes.textarea} ref={textarea} placeholder="Enter the image description here" autoFocus rows={5} wrap="soft" />
+        <img src={generatedImage} alt="Generated image" width={1024} height={1024} />
+        {errorMessage}
     </div>;
 }

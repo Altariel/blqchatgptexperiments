@@ -1,5 +1,4 @@
 import Button from '@mui/material/Button';
-import { OpenAI } from "openai";
 import React from 'react';
 import styles from './index.module.css';
 
@@ -8,11 +7,10 @@ import { Sender, SentMessage } from '@/types/chattypes';
 import SendIcon from '@mui/icons-material/Send';
 import { Box, Grid } from '@mui/material';
 import TextField from '@mui/material/TextField';
-import { chat } from '@/lib/openai-utils';
+import { chat, isOpenApiError } from '@/lib/openai-utils';
+import { getAPIKey } from '@/lib/apikeyprovider';
 
 export default function Chat() {
-  const inputAPIKeyRef = React.useRef<HTMLInputElement>(null);
-  const queryRef = React.useRef<HTMLInputElement>(null);
   const [messages, setMessages] = React.useState<SentMessage[]>([{ id:1, message: "How can I assist you today?", sender: Sender.Bot },]);
   const [input, setInput] = React.useState("");
 
@@ -25,14 +23,21 @@ export default function Chat() {
     setInput("");
     setMessages(mess => mess.concat([{id: mess.length +1, message: message, sender: Sender.User}]))
 
-    if (inputAPIKeyRef.current === null) {
+    const apiKey = getAPIKey();
+    if (!apiKey) {
+      setMessages(mess => mess.concat([{id: mess.length +1, message: "API Key not set", sender: Sender.Bot}]))
       return;
     }
 
-    const apiKey = inputAPIKeyRef.current.value;
-    setMessages(await chat(apiKey, message));
+    const response = await chat(apiKey, message);
+    if (!isOpenApiError(response)) {
+      setMessages(mess => mess.concat([{id: mess.length +1, message: response, sender: Sender.Bot}]))
+    }
+    else {
+      setMessages(mess => mess.concat([{id: mess.length +1, message: response.message, sender: Sender.Bot}]))
+    }
   }
-  
+
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInput(event.target.value);
   };
@@ -47,10 +52,6 @@ export default function Chat() {
         backgroundColor: "red",
       }}
     >
-      <div className={styles.label}>
-           <label htmlFor='api-key'>API Key</label>
-           <input className={styles.input} id="api-key" ref={inputAPIKeyRef} type="text" />
-         </div>
       <Box
         sx={{ flexGrow: 1, overflow: "auto", p: 2, backgroundColor: "blue" }}
       >
