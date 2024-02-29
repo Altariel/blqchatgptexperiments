@@ -62,8 +62,6 @@ export default function Chat() {
 
   return (
     <>
-    
-
     <Box
       sx={{
         height: "100vh",

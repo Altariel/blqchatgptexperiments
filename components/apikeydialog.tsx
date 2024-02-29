@@ -1,6 +1,6 @@
 import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
-import React, { useRef } from "react"
+import React from "react"
 import classes from "./apikeydialog.module.css";
 export type ApiKeyDialogProps = {
     currentKey: string;
@@ -40,7 +40,7 @@ export function ApiKeyDialog(props: ApiKeyDialogProps) {
             <hr />
             <div className={classes.form}>
                 <label htmlFor="api-key-input">API Key: </label>
-                {isEditing && <input id="api-key-input" type="text" placeholder="Paste your API Key here" value={key} onChange={handleInputChange} />}
+                {isEditing && <input autoFocus id="api-key-input" type="text" placeholder="Paste your API Key here" value={key} onChange={handleInputChange} />}
                 {!isEditing && key}
                 <div className={classes.buttons}>
                     <button type="button" onClick={onDelete} disabled={isEditing}>Delete</button>
