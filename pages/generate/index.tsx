@@ -15,7 +15,8 @@ export default function Generate() {
         if (description && apikey) {
             const response = await generate(apikey, description);
             if (!isOpenApiError(response)) {
-                setGeneratedImage(response.b64_json);
+                setGeneratedImage("data:image/png;base64, " + response.b64_json);
+                setErrorMessage("");
             } else {
                 setErrorMessage(response.message);
             }
@@ -24,9 +25,9 @@ export default function Generate() {
 
     return <div className={classes.container}>
         <h1>Generate</h1>
+        <textarea className={classes.textarea} ref={textarea} placeholder="Enter the image description here" autoFocus={true} rows={5} wrap="soft" />
         <button className={classes.button} onClick={generateHandler}>Generate</button>
-        <textarea className={classes.textarea} ref={textarea} placeholder="Enter the image description here" autoFocus rows={5} wrap="soft" />
+        {errorMessage && <div className={classes.error} >{errorMessage}</div>}
         <img src={generatedImage} alt="Generated image" width={1024} height={1024} />
-        {errorMessage}
     </div>;
 }
