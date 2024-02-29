@@ -1,6 +1,7 @@
 import React from "react";
 import { OpenAI } from "openai";
 import styles from './index.module.css'
+import { transcribe } from "@/lib/openai-utils";
 
 export default function Audio() {
   const inputAPIKeyRef = React.useRef<HTMLInputElement>(null);
@@ -23,26 +24,7 @@ export default function Audio() {
         return;
       }
 
-      const model = "gpt-3.5-turbo";
-      const apiKey = inputAPIKeyRef.current.value;
-
-      const openai = new OpenAI({
-        apiKey: apiKey, dangerouslyAllowBrowser: true
-      });
-
-      try {
-        // const response = await openai.createChatCompletion({
-        const response = await openai.audio.transcriptions.create({
-          file: file,
-          model: 'whisper-1',
-          language: "it",
-          response_format: "verbose_json",
-        });
-
-        setChatGPTAnswer(response.text);
-      } catch (error) {
-        setChatGPTAnswer("Error: No answer." + error);
-      }
+      setChatGPTAnswer(await transcribe(inputAPIKeyRef.current.value, file));
     };
     reader.readAsDataURL(file);
   }

@@ -8,6 +8,7 @@ import { Sender, SentMessage } from '@/types/chattypes';
 import SendIcon from '@mui/icons-material/Send';
 import { Box, Grid } from '@mui/material';
 import TextField from '@mui/material/TextField';
+import { chat } from '@/lib/openai-utils';
 
 export default function Chat() {
   const inputAPIKeyRef = React.useRef<HTMLInputElement>(null);
@@ -24,38 +25,14 @@ export default function Chat() {
     setInput("");
     setMessages(mess => mess.concat([{id: mess.length +1, message: message, sender: Sender.User}]))
 
-
     if (inputAPIKeyRef.current === null) {
       return;
     }
 
     const apiKey = inputAPIKeyRef.current.value;
-
-    const openai = new OpenAI({
-      apiKey: apiKey, dangerouslyAllowBrowser: true
-    });
-
-    const query = message;
-
-    try {
-      const response = await openai.chat.completions.create({
-        model: model,
-        messages: [
-          {
-            role: 'user',
-            content: query,
-          }]
-      });
-
-      const responseMessage = response.choices[0].message.content || "I'm sorry, I don't understand";
-
-
-    setMessages(mess => mess.concat([{id: mess.length +1, message: responseMessage, sender: Sender.Bot}]))
-
-    } catch (error) {
-      console.log(error);
-    }
+    setMessages(await chat(apiKey, message));
   }
+  
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInput(event.target.value);
   };
