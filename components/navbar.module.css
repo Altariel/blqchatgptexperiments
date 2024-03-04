@@ -1,0 +1,12 @@
+
+.navbar {
+    padding: 10px;
+    background-color: green;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.menuIcon {
+    margin-right: 20px;
+}

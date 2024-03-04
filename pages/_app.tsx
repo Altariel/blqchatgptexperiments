@@ -7,6 +7,7 @@ import '@fontsource/roboto/700.css';
 import type { AppProps } from "next/app";
 import Head from "next/head";
 import { Fragment } from "react";
+import Layout from '../components/layout'
 
 export default function App({ Component, pageProps }: AppProps) {
   return (<Fragment>
@@ -16,6 +17,8 @@ export default function App({ Component, pageProps }: AppProps) {
       <meta name="viewport" content="initial-scale=1, width=device-width" />
       <link rel="icon" href="/favicon.ico" />
     </Head>
+    <Layout>
     <Component {...pageProps} />
+    </Layout>
   </Fragment>);
 }
