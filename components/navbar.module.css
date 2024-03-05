@@ -10,3 +10,16 @@
 .menuIcon {
     margin-right: 20px;
 }
+
+.button:hover {
+    color: red;
+}
+
+.mainDiv {
+    font-family: "Arial";
+}
+
+.drawer {
+    width: 250;
+    padding: 20px;
+}
