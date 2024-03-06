@@ -12,6 +12,7 @@ export function setHistory(historyItem: string) {
     const newHistory = [historyItem, ...oldHistory];
     let str = "";
     newHistory.map(h => {
+      if (h != "")
         str += h + "[end]\n";
     })
   localStorage.setItem(HISTORY_STORAGE, str);
