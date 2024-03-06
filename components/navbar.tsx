@@ -7,10 +7,10 @@ import { getAPIKey, setAPIKey } from "../lib/apikeyprovider";
 import { ApiKeyDialog } from "./apikeydialog";
 import { useRouter } from "next/router";
 import classNames from "classnames";
-import { Box, Divider, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
+import { Box, Button, Divider, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
-import { getHistory } from "@/lib/historyprovider";
+import { clearHistory, getHistory } from "@/lib/historyprovider";
 
 export default function Navbar() {
     const [settingsDialogVisible, setSettingsDialogVisible] = React.useState(false);
@@ -58,11 +58,21 @@ export default function Navbar() {
       console.log(e.target.textContent);
     }
 
+    const clearHistoryHandler = () => {
+      clearHistory();
+    }
+
+    const history = getHistory();
+
     const DrawerList = (
-      <Box className={classNames(styles.mainDiv, styles.drawer)} role="presentation" onClick={toggleDrawer(false)}>
+      <Box
+        className={classNames(styles.mainDiv, styles.drawer)}
+        role="presentation"
+        onClick={toggleDrawer(false)}
+      >
         <h2>History</h2>
         <List>
-          { getHistory()?.map((text, index) => {
+          {history?.map((text, index) => {
             return (
               <ListItem key={index + text} disablePadding>
                 <ListItemButton onClick={handleItemClick}>
@@ -74,7 +84,19 @@ export default function Navbar() {
               </ListItem>
             );
           })}
-        </List>       
+        </List>
+
+        {history && (
+          <Button
+            fullWidth
+            size="large"
+            color="primary"
+            variant="contained"
+            onClick={clearHistoryHandler}
+          >
+            Clear History
+          </Button>
+        )}
       </Box>
     );
 

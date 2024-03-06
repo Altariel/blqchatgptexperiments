@@ -17,3 +17,7 @@ export function setHistory(historyItem: string) {
     const str = JSON.stringify(newHistory);   
   localStorage.setItem(HISTORY_STORAGE, str);
 }
+
+export function clearHistory() {
+  localStorage.setItem(HISTORY_STORAGE, "");
+}
