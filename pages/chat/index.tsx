@@ -9,6 +9,7 @@ import { Box, Grid } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import { chat, isOpenApiError } from '@/lib/openai-utils';
 import { getAPIKey } from '@/lib/apikeyprovider';
+import { setHistory } from '@/lib/historyprovider';
 
 export default function Chat() {
   const [messages, setMessages] = React.useState<SentMessage[]>([{ id:1, message: "How can I assist you today?", sender: Sender.Bot },]);
@@ -28,10 +29,11 @@ export default function Chat() {
       setMessages(mess => mess.concat([{id: mess.length +1, message: "API Key not set", sender: Sender.Bot}]))
       return;
     }
-
+    
     const response = await chat(apiKey, message);
     if (!isOpenApiError(response)) {
       setMessages(mess => mess.concat([{id: mess.length +1, message: response, sender: Sender.Bot}]))
+      setHistory(input.trim());
     }
     else {
       setMessages(mess => mess.concat([{id: mess.length +1, message: response.message, sender: Sender.Bot}]))

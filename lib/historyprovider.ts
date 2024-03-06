@@ -1,7 +1,10 @@
 const HISTORY_STORAGE = "chatgpt-history";
 
 export function getHistory(): string[] | undefined {
-  return localStorage.getItem(HISTORY_STORAGE)?.split('\n');
+  if (typeof window !== "undefined") {
+    return localStorage.getItem(HISTORY_STORAGE)?.split("[end]\n");
+  }
+  return undefined;
 }
 
 export function setHistory(historyItem: string) {
@@ -9,7 +12,7 @@ export function setHistory(historyItem: string) {
     const newHistory = [historyItem, ...oldHistory];
     let str = "";
     newHistory.map(h => {
-        str += h + "\n";
+        str += h + "[end]\n";
     })
   localStorage.setItem(HISTORY_STORAGE, str);
 }

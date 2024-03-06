@@ -10,6 +10,7 @@ import classNames from "classnames";
 import { Box, Divider, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
+import { getHistory } from "@/lib/historyprovider";
 
 export default function Navbar() {
     const [settingsDialogVisible, setSettingsDialogVisible] = React.useState(false);
@@ -53,36 +54,27 @@ export default function Navbar() {
       setOpenDrawer(newOpen);
     };
 
+    const handleItemClick = (e: any) => {
+      console.log(e.target.textContent);
+    }
+
     const DrawerList = (
       <Box className={classNames(styles.mainDiv, styles.drawer)} role="presentation" onClick={toggleDrawer(false)}>
         <h2>History</h2>
         <List>
-          {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => {
+          { getHistory()?.map((text, index) => {
             return (
-              <ListItem key={text} disablePadding>
-                <ListItemButton>
-                  <ListItemIcon>
+              <ListItem key={index + text} disablePadding>
+                <ListItemButton onClick={handleItemClick}>
+                  {/* <ListItemIcon>
                     {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                  </ListItemIcon>
+                  </ListItemIcon> */}
                   <ListItemText primary={text} />
                 </ListItemButton>
               </ListItem>
             );
           })}
-        </List>
-        <Divider />
-        <List>
-          {['All mail', 'Trash', 'Spam'].map((text, index) => (
-            <ListItem key={text} disablePadding>
-              <ListItemButton>
-                <ListItemIcon>
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                </ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
+        </List>       
       </Box>
     );
 
