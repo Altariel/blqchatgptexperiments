@@ -3,7 +3,7 @@ import React from 'react';
 import styles from './index.module.css';
 
 import ChatMessage from '@/components/chatmessage';
-import { Sender, SentMessage } from '@/types/chattypes';
+import { Role, Message } from '@/types/chattypes';
 import SendIcon from '@mui/icons-material/Send';
 import { Box, Grid } from '@mui/material';
 import TextField from '@mui/material/TextField';
@@ -13,7 +13,14 @@ import { setHistory } from '@/lib/historyprovider';
 import { useRouter } from 'next/router';
 
 export default function Chat() {
-  const [messages, setMessages] = React.useState<SentMessage[]>([{ id:1, message: "How can I assist you today?", sender: Sender.Bot },]);
+  const [messages, setMessages] = React.useState<Message[]>([
+    {
+      id: 1,
+      message: "How can I assist you today?",
+      role: Role.System,
+      timestamp: Date.now(),
+    },
+  ]);
   const [input, setInput] = React.useState("");
 
   const router = useRouter();
@@ -27,21 +34,21 @@ export default function Chat() {
       return;
     }
     setInput("");
-    setMessages(mess => mess.concat([{id: mess.length +1, message: message, sender: Sender.User}]))
+    setMessages(mess => mess.concat([{id: mess.length +1, message: message, role: Role.User, timestamp: Date.now()}]))
 
     const apiKey = getAPIKey();
     if (!apiKey) {
-      setMessages(mess => mess.concat([{id: mess.length +1, message: "API Key not set", sender: Sender.Bot}]))
+      setMessages(mess => mess.concat([{id: mess.length +1, message: "API Key not set", role: Role.System, timestamp: Date.now()}]))
       return;
     }
     
     const response = await chat(apiKey, message);
     if (!isOpenApiError(response)) {
-      setMessages(mess => mess.concat([{id: mess.length +1, message: response, sender: Sender.Bot}]))
+      setMessages(mess => mess.concat([{id: mess.length +1, message: response, role: Role.System, timestamp: Date.now()}]))
       setHistory(input.trim());
     }
     else {
-      setMessages(mess => mess.concat([{id: mess.length +1, message: response.message, sender: Sender.Bot}]))
+      setMessages(mess => mess.concat([{id: mess.length +1, message: response.message, role: Role.System, timestamp: Date.now()}]))
     }
   }
 

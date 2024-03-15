@@ -1,11 +1,11 @@
 import { Box, Paper, Typography } from "@mui/material";
-import { Sender, SentMessage } from "@/types/chattypes";
-export default function ChatMessage(message: SentMessage) {
+import { Role, Message } from "@/types/chattypes";
+export default function ChatMessage(message: Message) {
     return (<Box
                 sx={{
                   display: "flex",
                   justifyContent:
-                    message.sender === Sender.Bot ? "flex-start" : "flex-end",
+                    message.role === Role.System ? "flex-start" : "flex-end",
                   mb: 2,
                 }}
               >
@@ -14,7 +14,7 @@ export default function ChatMessage(message: SentMessage) {
                   sx={{
                     p: 1,
                     backgroundColor:
-                      message.sender === Sender.Bot
+                      message.role === Role.System
                         ? "primary.light"
                         : "secondary.light",
                   }}

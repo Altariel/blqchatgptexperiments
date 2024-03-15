@@ -1,10 +1,16 @@
-export enum Sender {
-    Bot = "bot",
+export enum Role {
+    System = "system",
     User = "user",
+    Assistant = "assistant",
 }
-export type SentMessage = {
+export type Message = {
     id: number,
-    message: string
-    sender: Sender
+    message: string,
+    role: Role,
+    timestamp: number,
+}
 
+export type ChatSession = {
+    id: number,
+    messages: Message[],
 }
