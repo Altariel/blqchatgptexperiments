@@ -45,19 +45,21 @@ export default function Chat() {
   };
 
   return (
-    <>
     <Box
       sx={{
-        height: "100vh",
         display: "flex",
         flexDirection: "column",
         backgroundColor: "red",
+        // flex: "1 1 auto",
+        height: "100%"
       }}
     >
       <Box
         sx={{ flexGrow: 1, overflow: "auto", p: 2, backgroundColor: "blue" }}
       >
-        {messages.map((message) => <ChatMessage key={message.id} {...message} />)}
+        {messages.map((message) => (
+          <ChatMessage key={message.id} {...message} />
+        ))}
       </Box>
       <Box sx={{ p: 2, backgroundColor: "background.default" }}>
         <Grid container spacing={2}>
@@ -84,7 +86,6 @@ export default function Chat() {
         </Grid>
       </Box>
     </Box>
-    </>
   );
 
   // return (
