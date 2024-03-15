@@ -11,15 +11,14 @@ import { Box, Button, Divider, Drawer, List, ListItem, ListItemButton, ListItemI
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
 import { clearHistory, getHistory } from "@/lib/historyprovider";
+import Link from "next/link";
 
 export default function Navbar() {
     const [settingsDialogVisible, setSettingsDialogVisible] = React.useState(false);
     const [apiKeyValue, setApiKeyValue] = React.useState("");
     const [openDrawer, setOpenDrawer] = React.useState(false);
 
-
     const router = useRouter();
-
 
     function showSettingsHandler() {
         setSettingsDialogVisible(true);
@@ -28,7 +27,6 @@ export default function Navbar() {
     function homeIconHandler() {
         router.push("/");        
     }
-
 
     function hideSettingsHandler(newKey: string) {
         setSettingsDialogVisible(false); 
@@ -79,7 +77,14 @@ export default function Navbar() {
                   {/* <ListItemIcon>
                     {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
                   </ListItemIcon> */}
-                  <ListItemText primary={text} />
+                  <Link
+                    href={{
+                      pathname: "/chat",
+                      query: {text}, // the data
+                    }}
+                  >
+                    {text}
+                  </Link>
                 </ListItemButton>
               </ListItem>
             );

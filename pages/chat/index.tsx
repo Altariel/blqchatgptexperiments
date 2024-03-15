@@ -10,10 +10,15 @@ import TextField from '@mui/material/TextField';
 import { chat, chatModel, isOpenApiError } from '@/lib/openai-utils';
 import { getAPIKey } from '@/lib/apikeyprovider';
 import { setHistory } from '@/lib/historyprovider';
+import { useRouter } from 'next/router';
 
 export default function Chat() {
   const [messages, setMessages] = React.useState<SentMessage[]>([{ id:1, message: "How can I assist you today?", sender: Sender.Bot },]);
   const [input, setInput] = React.useState("");
+
+  const router = useRouter();
+  const data = router.query;
+  console.log("*** " + data.text);
 
   async function handleSendToAI() {
     const model = chatModel;
