@@ -1,6 +1,6 @@
 import { OpenAI } from "openai";
 
-const chatModel = "gpt-4-0125-preview";
+export const chatModel = "gpt-3.5-turbo-0125";//"gpt-4-0125-preview";
 const transcribeModel = "whisper-1";
 const generateModel = "dall-e-3";
 

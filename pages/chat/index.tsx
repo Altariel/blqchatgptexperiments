@@ -7,7 +7,7 @@ import { Sender, SentMessage } from '@/types/chattypes';
 import SendIcon from '@mui/icons-material/Send';
 import { Box, Grid } from '@mui/material';
 import TextField from '@mui/material/TextField';
-import { chat, isOpenApiError } from '@/lib/openai-utils';
+import { chat, chatModel, isOpenApiError } from '@/lib/openai-utils';
 import { getAPIKey } from '@/lib/apikeyprovider';
 import { setHistory } from '@/lib/historyprovider';
 
@@ -16,7 +16,7 @@ export default function Chat() {
   const [input, setInput] = React.useState("");
 
   async function handleSendToAI() {
-    const model = "gpt-4-0125-preview";
+    const model = chatModel;
     const message = input.trim();
     if (message === "") {
       return;
