@@ -1,4 +1,6 @@
+import { CustomRole, Message, OpenAIRole, Role } from "@/types/chattypes";
 import { OpenAI } from "openai";
+import { ChatCompletionMessageParam } from "openai/resources/chat/completions.mjs";
 
 export const chatModel = "gpt-3.5-turbo-0125";//"gpt-4-0125-preview";
 const transcribeModel = "whisper-1";
@@ -43,23 +45,22 @@ export async function transcribe(apiKey: string, file: File): Promise<string|Ope
   }
 }
 
-export async function chat(apiKey: string, message: string) : Promise<string|OpenAIApiError> {
+export async function chat(apiKey: string, messages: Message[]) : Promise<string|OpenAIApiError> {
   const openai = new OpenAI({
     apiKey: apiKey,
     dangerouslyAllowBrowser: true,
   });
 
-  const query = message;
+  const query = messages
+    .filter((m) => m.role !== CustomRole.Application)
+    .map((message) => {
+      return { role: message.role as OpenAIRole, content: message.content };
+    });
 
   try {
     const response = await openai.chat.completions.create({
       model: chatModel,
-      messages: [
-        {
-          role: "user",
-          content: query,
-        },
-      ],
+      messages: query
     });
 
     return (

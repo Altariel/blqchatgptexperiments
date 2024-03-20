@@ -1,11 +1,18 @@
-export enum Role {
+export enum OpenAIRole {
     System = "system",
     User = "user",
-    Assistant = "assistant",
+    Assistant = "assistant",   
 }
+
+export enum CustomRole{    
+    Application = "application",
+}
+
+export type Role = OpenAIRole | CustomRole;
+
 export type Message = {
     id: number,
-    message: string,
+    content: string,
     role: Role,
     timestamp: number,
 }
