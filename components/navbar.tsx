@@ -2,21 +2,23 @@ import styles from "./navbar.module.css";
 import MenuIcon from '@mui/icons-material/Menu';
 import SettingsIcon from '@mui/icons-material/Settings';
 import HomeIcon from '@mui/icons-material/Home';
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { getAPIKey, setAPIKey } from "../lib/apikeyprovider";
 import { ApiKeyDialog } from "./apikeydialog";
 import { useRouter } from "next/router";
 import classNames from "classnames";
-import { Box, Button, Divider, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
-import { clearHistory, getHistory } from "@/lib/historyprovider";
+import { Box, Button, Drawer, List, ListItem, ListItemButton } from "@mui/material";
 import Link from "next/link";
+import { DataStorageContext } from "@/lib/data-storage-provider";
+import { ChatSession } from "@/types/chattypes";
 
 export default function Navbar() {
     const [settingsDialogVisible, setSettingsDialogVisible] = React.useState(false);
     const [apiKeyValue, setApiKeyValue] = React.useState("");
     const [openDrawer, setOpenDrawer] = React.useState(false);
+    const [history, setHistory] = React.useState<ChatSession[]>([]);
+
+    const dataStorageContext = useContext(DataStorageContext);
 
     const router = useRouter();
 
@@ -57,10 +59,15 @@ export default function Navbar() {
     }
 
     const clearHistoryHandler = () => {
-      clearHistory();
+      void dataStorageContext.clear();
     }
 
-    const history = getHistory();
+    useEffect(() => {
+      const setHistoryFunc = async () => {
+        setHistory(await dataStorageContext.getAll());
+      };
+      setHistoryFunc();
+    });
 
     const DrawerList = (
       <Box

@@ -18,6 +18,6 @@ export type Message = {
 }
 
 export type ChatSession = {
-    id: number,
+    id: string,
     messages: Message[],
 }
