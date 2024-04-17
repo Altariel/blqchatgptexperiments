@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import React, { useRef } from "react";
 import classes from "./index.module.css";
-import { getAPIKey } from "@/lib/apikeyprovider";
+import { getAPIKey } from "@/lib/apikey-storage";
 import { generate, isOpenApiError } from "@/lib/openai-utils";
 
 export default function Generate() {

@@ -1,11 +1,13 @@
+'use client';
+
 import classNames from "classnames";
 import { useRouter } from "next/router";
-import React, { useEffect } from "react";
-import { getAPIKey } from "../lib/apikeyprovider";
+import { useContext } from "react";
 import classes from "./index.module.css";
+import { ApiKeyValueContext } from "@/lib/apikey-value-provider";
 
 export default function HomePage() {
-    const [apiKeyValue, setApiKeyValue] = React.useState("");
+    const apiKeyValue = useContext(ApiKeyValueContext);
     const router = useRouter();
 
     function handleClickChat() {
@@ -20,20 +22,14 @@ export default function HomePage() {
         router.push("/generate");
     }
 
-    useEffect(() => {
-        setApiKeyValue(getAPIKey() || "");
-    }, []);
-
-    const apiKeyExists = apiKeyValue.length > 0;
-
-    return <div className={classes.main}>        
-        <button className={classNames(classes.bigButton, classes.bigButtonChat)} onClick={handleClickChat} disabled={!apiKeyExists}>
+    return <div className={classes.main}>
+        <button className={classNames(classes.bigButton, classes.bigButtonChat)} onClick={handleClickChat} disabled={!apiKeyValue}>
             Chat
         </button>
-        <button className={classNames(classes.bigButton, classes.bigButtonTranscribe)} onClick={handleClickTranscribe} disabled={!apiKeyExists}>
+        <button className={classNames(classes.bigButton, classes.bigButtonTranscribe)} onClick={handleClickTranscribe} disabled={!apiKeyValue}>
             Audio
         </button>
-        <button className={classNames(classes.bigButton, classes.bigButtonGenerate)} onClick={handleClickGenerate} disabled={!apiKeyExists}>
+        <button className={classNames(classes.bigButton, classes.bigButtonGenerate)} onClick={handleClickGenerate} disabled={!apiKeyValue}>
             Generate
         </button>
     </div>
