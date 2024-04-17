@@ -67,7 +67,7 @@ export default function Navbar() {
         setHistory(await dataStorageContext.getAll());
       };
       setHistoryFunc();
-    });
+    }, [dataStorageContext]);
 
     const DrawerList = (
       <Box
@@ -77,9 +77,9 @@ export default function Navbar() {
       >
         <h2>History</h2>
         <List>
-          {history?.map((text, index) => {
+          {history?.map((chatSession, index) => {
             return (
-              <ListItem key={index + text} disablePadding>
+              <ListItem key={chatSession.id} disablePadding>
                 <ListItemButton onClick={handleItemClick}>
                   {/* <ListItemIcon>
                     {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
@@ -87,10 +87,10 @@ export default function Navbar() {
                   <Link
                     href={{
                       pathname: "/chat",
-                      query: {text}, // the data
+                      query: {text: chatSession.messages[0].id}, // the data
                     }}
                   >
-                    {text}
+                    {chatSession.messages[0].content}
                   </Link>
                 </ListItemButton>
               </ListItem>
