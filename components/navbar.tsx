@@ -1,25 +1,25 @@
-import styles from "./navbar.module.css";
-import MenuIcon from '@mui/icons-material/Menu';
-import SettingsIcon from '@mui/icons-material/Settings';
-import HomeIcon from '@mui/icons-material/Home';
-import React, { useContext, useEffect } from "react";
-import { ApiKeyDialog } from "./apikeydialog";
-import { useRouter } from "next/router";
-import classNames from "classnames";
-import { Box, Button, Drawer, List, ListItem, ListItemButton } from "@mui/material";
-import Link from "next/link";
-import { DataStorageContext } from "@/lib/data-storage-provider";
-import { ChatSession } from "@/types/chattypes";
 import { ApiKeyStorageContext } from "@/lib/apikey-storage-provider";
 import { ApiKeyValueContext } from "@/lib/apikey-value-provider";
+import { ChatSessionsValueContext } from "@/lib/chat-sessions-value-provider";
+import HomeIcon from '@mui/icons-material/Home';
+import MenuIcon from '@mui/icons-material/Menu';
+import SettingsIcon from '@mui/icons-material/Settings';
+import { Box, Button, Drawer, List, ListItem, ListItemButton } from "@mui/material";
+import classNames from "classnames";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import React, { useContext, useEffect } from "react";
+import { ApiKeyDialog } from "./apikeydialog";
+import styles from "./navbar.module.css";
+import { DataStorageContext } from "@/lib/data-storage-provider";
 
 export default function Navbar() {
   const [settingsDialogVisible, setSettingsDialogVisible] = React.useState(false);
   const apiKeyValue = useContext(ApiKeyValueContext);
   const [openDrawer, setOpenDrawer] = React.useState(false);
-  const [history, setHistory] = React.useState<ChatSession[]>([]);
-
+  
   const dataStorageContext = useContext(DataStorageContext);
+  const history = useContext(ChatSessionsValueContext);
   const apiKeyStorageContext = useContext(ApiKeyStorageContext);  
 
   const router = useRouter();
@@ -57,13 +57,6 @@ export default function Navbar() {
   const clearHistoryHandler = () => {
     void dataStorageContext.clear();
   }
-
-  useEffect(() => {
-    const setHistoryFunc = async () => {
-      setHistory(await dataStorageContext.getAll());
-    };
-    setHistoryFunc();
-  }, [dataStorageContext]);
 
   const DrawerList = (
     <Box

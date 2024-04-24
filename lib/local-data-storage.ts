@@ -4,6 +4,7 @@ import { IDataStorage } from "@/types/idatastorage";
 const HISTORY_STORAGE = "chatgpt-history";
 
 export class LocalDataStorage implements IDataStorage {
+  private observers: (() => void)[] = [];
   allData: Map<string, ChatSession> = new Map();
 
   async ensureDataIsAvailable() {
@@ -34,6 +35,7 @@ export class LocalDataStorage implements IDataStorage {
 
     const obj = Object.fromEntries(this.allData);
     localStorage.setItem(HISTORY_STORAGE, JSON.stringify(obj));
+    this.notifyObservers();
   }
 
   async remove(id: string) {
@@ -42,6 +44,7 @@ export class LocalDataStorage implements IDataStorage {
 
     const obj = Object.fromEntries(this.allData);
     localStorage.setItem(HISTORY_STORAGE, JSON.stringify(obj));
+    this.notifyObservers();
   }
 
   async clear() {
@@ -49,5 +52,18 @@ export class LocalDataStorage implements IDataStorage {
 
     const obj = Object.fromEntries(this.allData);
     localStorage.setItem(HISTORY_STORAGE, JSON.stringify(obj));
+    this.notifyObservers();
+  }
+
+  addObserver(callback: () => void) {
+    this.observers.push(callback);
+  }
+
+  removeObserver(callback: () => void) {
+    this.observers = this.observers.filter((observer) => observer !== callback);
+  }
+
+  private notifyObservers() {
+    this.observers.forEach((observer) => observer());
   }
 }

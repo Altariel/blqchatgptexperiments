@@ -16,21 +16,39 @@ import { ApiKeyStorageContext } from "@/lib/apikey-storage-provider";
 import { ApiKeyStorage } from "@/lib/apikey-storage";
 import React from "react";
 import { ApiKeyValueContext } from "@/lib/apikey-value-provider";
+import { ChatSession } from "@/types/chattypes";
+import { ChatSessionsValueContext } from "@/lib/chat-sessions-value-provider";
 
 export default function App({ Component, pageProps }: AppProps) {
-  const storage = new LocalDataStorage();
+
+  const storage = useMemo(() => new LocalDataStorage(), []);
   const apiKeyStorage = useMemo(() => new ApiKeyStorage(), []);
   const [apiKey, setApiKey] = useState<string | null>(null);
+  const [chatSessions, setChatSessions] = useState([] as ChatSession[]);
 
   apiKeyStorage.addObserver((newKey) => setApiKey(newKey));
 
-  // useEffect che carica la roba dalo storage, con funzione asincrona
-  // poi lo setta nello state
-  // il provider lo passa a tutti i figli
+  storage.addObserver(() => {
+    async function updateMessages() {
+      const chatSessions = await storage.getAll();
+      setChatSessions(chatSessions);
+    }
 
+    updateMessages();
+  });
+  
   useEffect(() => {
     setApiKey(apiKeyStorage.getAPIKey());
   }, [apiKeyStorage]);
+
+  useEffect(() => {
+    async function fetchData() {
+      const chatSessions = await storage.getAll();
+      setChatSessions(chatSessions);
+    }
+
+    fetchData();
+  }, [storage]);
 
   return (
     <Fragment>
@@ -45,11 +63,13 @@ export default function App({ Component, pageProps }: AppProps) {
       </Head>
       <ApiKeyValueContext.Provider value={apiKey}>
         <ApiKeyStorageContext.Provider value={apiKeyStorage}>
-          <DataStorageContext.Provider value={storage}>
-            <Layout>
-              <Component {...pageProps} />
-            </Layout>
-          </DataStorageContext.Provider>
+          <ChatSessionsValueContext.Provider value={chatSessions}>
+            <DataStorageContext.Provider value={storage}>
+              <Layout>
+                <Component {...pageProps} />
+              </Layout>
+            </DataStorageContext.Provider>
+          </ChatSessionsValueContext.Provider>
         </ApiKeyStorageContext.Provider>
       </ApiKeyValueContext.Provider>
     </Fragment>
