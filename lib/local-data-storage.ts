@@ -10,10 +10,10 @@ export class LocalDataStorage implements IDataStorage {
     const data = localStorage.getItem(HISTORY_STORAGE);
     if (data) {
       const data2 = JSON.parse(data);
-      if (data2) {
-        this.allData = new Map(data2.map((obj: ChatSession) => [obj.id, obj]));
-      } else {
+      if (!data2 || Object.keys(data2).length === 0) {
         this.allData = new Map();
+      } else {
+        this.allData = new Map(Object.entries(data2));
       }
     }
   }
@@ -31,16 +31,23 @@ export class LocalDataStorage implements IDataStorage {
   async set(value: any) {
     this.ensureDataIsAvailable();
     this.allData.set(value.id, value);
-    localStorage.setItem(HISTORY_STORAGE, JSON.stringify(this.allData.values()));
+
+    const obj = Object.fromEntries(this.allData);
+    localStorage.setItem(HISTORY_STORAGE, JSON.stringify(obj));
   }
 
   async remove(id: string) {
     this.ensureDataIsAvailable();
     this.allData.delete(id);
-    localStorage.setItem(HISTORY_STORAGE, JSON.stringify(this.allData.values()));
+
+    const obj = Object.fromEntries(this.allData);
+    localStorage.setItem(HISTORY_STORAGE, JSON.stringify(obj));
   }
+
   async clear() {
     this.allData.clear();
-    localStorage.setItem(HISTORY_STORAGE, JSON.stringify(this.allData.values()));
+
+    const obj = Object.fromEntries(this.allData);
+    localStorage.setItem(HISTORY_STORAGE, JSON.stringify(obj));
   }
 }

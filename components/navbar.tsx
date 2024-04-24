@@ -77,16 +77,13 @@ export default function Navbar() {
           return (
             <ListItem key={chatSession.id} disablePadding>
               <ListItemButton onClick={handleItemClick}>
-                {/* <ListItemIcon>
-                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                  </ListItemIcon> */}
                 <Link
                   href={{
                     pathname: "/chat",
-                    query: { text: chatSession.messages[0].id }, // the data
+                    query: {id: chatSession.id}, // the data
                   }}
                 >
-                  {chatSession.messages[0].content}
+                  {chatSession.id}
                 </Link>
               </ListItemButton>
             </ListItem>

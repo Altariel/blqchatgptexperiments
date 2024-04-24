@@ -21,3 +21,8 @@ export type ChatSession = {
     id: string,
     messages: Message[],
 }
+
+export function getChatSessionId(messages: Message[]): string {
+    const message = messages.find( (message) => message.role === OpenAIRole.User);
+    return (messages && message?.content) ||  "unknown";
+}
