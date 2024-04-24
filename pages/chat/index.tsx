@@ -44,7 +44,7 @@ export default function Chat() {
     }
 
     fetchData();
-    }, [router.query, dataStorageContext]);
+  }, [router.query, dataStorageContext]);
 
   // TODO: set che chat model
 
@@ -78,6 +78,13 @@ export default function Chat() {
     }
   }
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      handleSendToAI();
+    }
+  };
+
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInput(event.target.value);
   };
@@ -90,7 +97,6 @@ export default function Chat() {
         display: "flex",
         flexDirection: "column",
         backgroundColor: "red",
-        // flex: "1 1 auto",
         height: "100%"
       }}
     >
@@ -109,6 +115,7 @@ export default function Chat() {
               placeholder="Type a message"
               value={input}
               onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
             />
           </Grid>
           <Grid item xs={2}>
