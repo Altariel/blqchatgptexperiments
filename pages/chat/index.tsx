@@ -66,6 +66,13 @@ export default function Chat() {
     setInput(event.target.value);
   };
 
+  const handleOnKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      handleSendToAI();
+    }
+  }
+
   return (
     <Box
       sx={{
@@ -91,6 +98,7 @@ export default function Chat() {
               placeholder="Type a message"
               value={input}
               onChange={handleInputChange}
+              onKeyDown={handleOnKeyDown}
             />
           </Grid>
           <Grid item xs={2}>
