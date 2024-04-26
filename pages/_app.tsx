@@ -16,6 +16,8 @@ import { ApiKeyStorageContext } from "@/lib/apikey-storage-provider";
 import { ApiKeyStorage } from "@/lib/apikey-storage";
 import React from "react";
 import { ApiKeyValueContext } from "@/lib/apikey-value-provider";
+import { ThemeProvider } from "@mui/material";
+import theme from "./theme";
 
 export default function App({ Component, pageProps }: AppProps) {
   const storage = new LocalDataStorage();
@@ -33,25 +35,27 @@ export default function App({ Component, pageProps }: AppProps) {
   }, [apiKeyStorage]);
 
   return (
-    <Fragment>
-      <Head>
-        <title>BLQ Chat</title>
-        <meta
-          name="description"
-          content="A web app that does the ChatGPT queries for you"
-        />
-        <meta name="viewport" content="initial-scale=1, width=device-width" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <ApiKeyValueContext.Provider value={apiKey}>
-        <ApiKeyStorageContext.Provider value={apiKeyStorage}>
-          <DataStorageContext.Provider value={storage}>
-            <Layout>
-              <Component {...pageProps} />
-            </Layout>
-          </DataStorageContext.Provider>
-        </ApiKeyStorageContext.Provider>
-      </ApiKeyValueContext.Provider>
+    <Fragment><ThemeProvider theme={theme}>
+      
+        <Head>
+          <title>BLQ Chat</title>
+          <meta
+            name="description"
+            content="A web app that does the ChatGPT queries for you"
+          />
+          <meta name="viewport" content="initial-scale=1, width=device-width" />
+          <link rel="icon" href="/favicon.ico" />
+        </Head>
+        <ApiKeyValueContext.Provider value={apiKey}>
+          <ApiKeyStorageContext.Provider value={apiKeyStorage}>
+            <DataStorageContext.Provider value={storage}>
+              <Layout>
+                <Component {...pageProps} />
+              </Layout>
+            </DataStorageContext.Provider>
+          </ApiKeyStorageContext.Provider>
+        </ApiKeyValueContext.Provider>
+    </ThemeProvider>
     </Fragment>
   );
 }

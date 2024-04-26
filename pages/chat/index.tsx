@@ -78,13 +78,13 @@ export default function Chat() {
       sx={{
         display: "flex",
         flexDirection: "column",
-        backgroundColor: "red",
+        backgroundColor: "#F8F8F8",
         // flex: "1 1 auto",
         height: "100%"
       }}
     >
       <Box
-        sx={{ flexGrow: 1, overflow: "auto", p: 2, backgroundColor: "blue" }}
+        sx={{ flexGrow: 1, overflow: "auto", p: 2 }}
       >
         {messages.map((message) => (
           <ChatMessage key={message.id} {...message} />
@@ -118,23 +118,4 @@ export default function Chat() {
       </Box>
     </Box>
   );
-
-  // return (
-  //   <div className={styles.main}>
-  //     <h1>Chat</h1>
-  //     <div> model: "gpt-3.5-turbo"</div>
-  //     <form>
-  //       <div className={styles.label}>
-  //         <label htmlFor='api-key'>API Key</label>
-  //         <input className={styles.input} id="api-key" ref={inputAPIKeyRef} type="text" />
-  //       </div>
-  //       <div className={styles.label}>
-  //         <label htmlFor='query'>Query</label>
-  //         <input className={styles.input} id="query" ref={queryRef} type="text" defaultValue="Chi e' il presidente degli stati uniti?" />
-  //       </div>
-  //       <div><button onClick={handleSendToAI} >Go</button></div>
-  //       <div>{chatGPTAnswer}</div>
-  //     </form>
-  //   </div>
-  // )
 }

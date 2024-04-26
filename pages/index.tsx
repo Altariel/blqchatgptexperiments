@@ -5,6 +5,10 @@ import { useRouter } from "next/router";
 import { useContext } from "react";
 import classes from "./index.module.css";
 import { ApiKeyValueContext } from "@/lib/apikey-value-provider";
+import { Button } from "@mui/material";
+import ChatIcon from '@mui/icons-material/Chat';
+import GraphicEqIcon from '@mui/icons-material/GraphicEq';
+import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 
 export default function HomePage() {
     const apiKeyValue = useContext(ApiKeyValueContext);
@@ -23,14 +27,14 @@ export default function HomePage() {
     }
 
     return <div className={classes.main}>
-        <button className={classNames(classes.bigButton, classes.bigButtonChat)} onClick={handleClickChat} disabled={!apiKeyValue}>
-            Chat
-        </button>
-        <button className={classNames(classes.bigButton, classes.bigButtonTranscribe)} onClick={handleClickTranscribe} disabled={!apiKeyValue}>
-            Audio
-        </button>
-        <button className={classNames(classes.bigButton, classes.bigButtonGenerate)} onClick={handleClickGenerate} disabled={!apiKeyValue}>
-            Generate
-        </button>
+        <Button variant="contained" className={classNames(classes.bigButton)} onClick={handleClickChat} disabled={!apiKeyValue}>
+            <ChatIcon/> Chat
+        </Button>
+        <Button  variant="contained" className={classNames(classes.bigButton)} onClick={handleClickTranscribe} disabled={!apiKeyValue}>
+            <GraphicEqIcon/> Audio
+        </Button>
+        <Button variant="contained" className={classNames(classes.bigButton)} onClick={handleClickGenerate} disabled={!apiKeyValue}>
+            <AddPhotoAlternateIcon/> Generate
+        </Button>
     </div>
 }
