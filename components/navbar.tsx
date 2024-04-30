@@ -83,10 +83,14 @@ export default function Navbar() {
                 <Link
                   href={{
                     pathname: "/chat",
-                    query: { text: chatSession.messages[0].id }, // the data
+                    query: {
+                      text: chatSession.messages
+                        ? chatSession.messages[0].id
+                        : "",
+                    }, // the data
                   }}
                 >
-                  {chatSession.messages[0].content}
+                  {chatSession.messages ? chatSession.messages[0].content : ""}
                 </Link>
               </ListItemButton>
             </ListItem>
