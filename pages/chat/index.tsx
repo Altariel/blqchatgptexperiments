@@ -2,13 +2,14 @@ import Button from '@mui/material/Button';
 import React, { useContext } from 'react';
 
 import ChatMessage from '@/components/chatmessage';
-import { Message, OpenAIRole, CustomRole } from '@/types/chattypes';
+import { AIEngineValueContext } from '@/lib/aiengine-value-provider';
+import { ApiKeyValueContext } from '@/lib/apikey-value-provider';
+import { chat, isOpenApiError } from '@/lib/openai-utils';
+import { CustomRole, Message, OpenAIRole } from '@/types/chattypes';
 import SendIcon from '@mui/icons-material/Send';
 import { Box, Grid } from '@mui/material';
 import TextField from '@mui/material/TextField';
-import { chat, isOpenApiError } from '@/lib/openai-utils';
 import { useRouter } from 'next/router';
-import { ApiKeyValueContext } from '@/lib/apikey-value-provider';
 
 export default function Chat() {
   const [messages, setMessages] = React.useState<Message[]>([
@@ -29,6 +30,7 @@ export default function Chat() {
 
   const router = useRouter();
   const apiKey = useContext(ApiKeyValueContext);
+  const aiEngineModel = useContext(AIEngineValueContext);
 
   // TODO: recover messages if this is not null
   const data = router.query;
@@ -51,7 +53,7 @@ export default function Chat() {
       return;
     }
     
-    const response = await chat(apiKey, newMessages);
+    const response = await chat(apiKey, aiEngineModel, newMessages);
     if (!isOpenApiError(response)) {
       setMessages(mess => mess.concat([{ id: mess.length + 1, content: response, role: OpenAIRole.Assistant, timestamp: Date.now() }]))
       // TODO!!!

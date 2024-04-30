@@ -1,8 +1,7 @@
-import { CustomRole, Message, OpenAIRole, Role } from "@/types/chattypes";
+import { CustomRole, Message, OpenAIRole } from "@/types/chattypes";
 import { OpenAI } from "openai";
-import { ChatCompletionMessageParam } from "openai/resources/chat/completions.mjs";
+import { AIEngineModel, getAIEngineModelString } from "./aiengine-storage";
 
-export const chatModel = "gpt-3.5-turbo-0125";//"gpt-4-0125-preview";
 const transcribeModel = "whisper-1";
 const generateModel = "dall-e-3";
 
@@ -45,7 +44,7 @@ export async function transcribe(apiKey: string, file: File): Promise<string|Ope
   }
 }
 
-export async function chat(apiKey: string, messages: Message[]) : Promise<string|OpenAIApiError> {
+export async function chat(apiKey: string, aiEngineModel: AIEngineModel,  messages: Message[]) : Promise<string|OpenAIApiError> {
   const openai = new OpenAI({
     apiKey: apiKey,
     dangerouslyAllowBrowser: true,
@@ -57,9 +56,11 @@ export async function chat(apiKey: string, messages: Message[]) : Promise<string
       return { role: message.role as OpenAIRole, content: message.content };
     });
 
+  const aiEngineModelString = getAIEngineModelString(aiEngineModel);
+
   try {
     const response = await openai.chat.completions.create({
-      model: chatModel,
+      model: aiEngineModelString,
       messages: query
     });
 
