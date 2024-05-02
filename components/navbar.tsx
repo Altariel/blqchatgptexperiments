@@ -9,18 +9,23 @@ import classNames from "classnames";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useContext, useEffect } from "react";
-import { ApiKeyDialog } from "./apikeydialog";
 import styles from "./navbar.module.css";
 import { DataStorageContext } from "@/lib/data-storage-provider";
+import { AIEngineValueContext } from "@/lib/aiengine-value-provider";
+import { AIEngineStorageContext } from "@/lib/aiengine-storage-provider";
+import { AIEngineModel } from "@/lib/aiengine-storage";
+import { ApiKeyDialog } from "./settingsdialog";
 
 export default function Navbar() {
   const [settingsDialogVisible, setSettingsDialogVisible] = React.useState(false);
   const apiKeyValue = useContext(ApiKeyValueContext);
+  const aiEngineModelValue = useContext(AIEngineValueContext);
   const [openDrawer, setOpenDrawer] = React.useState(false);
   
   const dataStorageContext = useContext(DataStorageContext);
   const history = useContext(ChatSessionsValueContext);
   const apiKeyStorageContext = useContext(ApiKeyStorageContext);  
+  const aiEngineStorageContext = useContext(AIEngineStorageContext);  
 
   const router = useRouter();
 
@@ -32,9 +37,12 @@ export default function Navbar() {
     router.push("/");
   }
 
-  function hideSettingsHandler(newKey: string) {
+  function hideSettingsHandler(newKey: string, newAiEngine: AIEngineModel) {
     setSettingsDialogVisible(false);
     apiKeyStorageContext.setAPIKey(newKey);
+
+    //
+    aiEngineStorageContext.setAIEngine(newAiEngine);
   }
 
   function getPageName() {
@@ -68,7 +76,7 @@ export default function Navbar() {
       <List>
         {history?.map((chatSession, index) => {
           return (
-            <ListItem key={chatSession.id} disablePadding>
+            <ListItem key={chatSession.id + "-" + index} disablePadding>
               <ListItemButton onClick={handleItemClick}>
                 <Link
                   href={{
@@ -106,6 +114,7 @@ export default function Navbar() {
             open={settingsDialogVisible}
             onClose={hideSettingsHandler}
             currentKey={apiKeyValue || ""}
+            currentAiEngineModel={aiEngineModelValue}
           />
         )}
         <div className={styles.leftIcons}>

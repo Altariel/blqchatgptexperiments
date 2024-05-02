@@ -2,14 +2,15 @@ import Button from '@mui/material/Button';
 import React, { useContext, useEffect } from 'react';
 
 import ChatMessage from '@/components/chatmessage';
-import { Message, OpenAIRole, CustomRole, getChatSessionId } from '@/types/chattypes';
+import { AIEngineValueContext } from '@/lib/aiengine-value-provider';
+import { CustomRole, Message, OpenAIRole, getChatSessionId } from '@/types/chattypes';
 import SendIcon from '@mui/icons-material/Send';
 import { Box, Grid } from '@mui/material';
 import TextField from '@mui/material/TextField';
-import { chat, isOpenApiError } from '@/lib/openai-utils';
 import { useRouter } from 'next/router';
 import { ApiKeyValueContext } from '@/lib/apikey-value-provider';
 import { DataStorageContext } from '@/lib/data-storage-provider';
+import { chat, isOpenApiError } from '@/lib/openai-utils';
 
 export default function Chat() {
   const [messages, setMessages] = React.useState<Message[]>([
@@ -31,6 +32,7 @@ export default function Chat() {
   const router = useRouter();
   const apiKey = useContext(ApiKeyValueContext);
   const dataStorageContext = useContext(DataStorageContext);
+  const aiEngineModel = useContext(AIEngineValueContext);
 
   useEffect(() => {
     async function fetchData() {
@@ -62,8 +64,8 @@ export default function Chat() {
       setMessages(newMessages);
       return;
     }
-
-    const response = await chat(apiKey, newMessages);
+    
+    const response = await chat(apiKey, aiEngineModel, newMessages);
     if (!isOpenApiError(response)) {
       newMessages.push({ id: newMessages.length + 1, content: response, role: OpenAIRole.Assistant, timestamp: Date.now() });
       setMessages(newMessages);
