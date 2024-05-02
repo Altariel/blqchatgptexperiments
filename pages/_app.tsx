@@ -16,6 +16,8 @@ import { ApiKeyStorageContext } from "@/lib/apikey-storage-provider";
 import { ApiKeyStorage } from "@/lib/apikey-storage";
 import React from "react";
 import { ApiKeyValueContext } from "@/lib/apikey-value-provider";
+import { ChatSession } from "@/types/chattypes";
+import { ChatSessionsValueContext } from "@/lib/chat-sessions-value-provider";
 import { AIEngineStorage, AIEngineModel } from "@/lib/aiengine-storage";
 import { AIEngineValueContext } from "@/lib/aiengine-value-provider";
 import { AIEngineStorageContext } from "@/lib/aiengine-storage-provider";
@@ -36,15 +38,34 @@ export default function App({ Component, pageProps }: AppProps) {
   }, []);
   const [apiKey, setApiKey] = useState<string | null>(null);
   const [aiEngine, setAiEngine] = useState<AIEngineModel>(AIEngineModel.Gpt3_5);
+  const [chatSessions, setChatSessions] = useState([] as ChatSession[]);
 
   // useEffect che carica la roba dallo storage, con funzione asincrona
   // poi lo setta nello state
   // il provider lo passa a tutti i figli
+  storage.addObserver(() => {
+    async function updateMessages() {
+      const chatSessions = await storage.getAll();
+      setChatSessions(chatSessions);
+    }
 
+
+    updateMessages();
+  });
+  
   useEffect(() => {
     setApiKey(apiKeyStorage.getAPIKey());
     setAiEngine(aiEngineStorage.getAIEngine());
   }, [apiKeyStorage, aiEngineStorage]);
+
+  useEffect(() => {
+    async function fetchData() {
+      const chatSessions = await storage.getAll();
+      setChatSessions(chatSessions);
+    }
+
+    fetchData();
+  }, [storage]);
 
   return (
     <Fragment>
