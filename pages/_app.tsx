@@ -1,7 +1,11 @@
 'use client';
 
+import { AIEngineModel, AIEngineStorage } from "@/lib/aiengine-storage";
+import { ApiKeyStorage } from "@/lib/apikey-storage";
+import { ChatSessionsContext } from "@/lib/chat-sessions-provider";
+import { LocalDataStorage } from "@/lib/local-data-storage";
 import "@/styles/globals.css";
-import 'typeface-roboto'
+import { ChatSession } from "@/types/chattypes";
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
@@ -9,21 +13,13 @@ import '@fontsource/roboto/700.css';
 import type { AppProps } from "next/app";
 import Head from "next/head";
 import { Fragment, useEffect, useMemo, useState } from "react";
-import Layout from '../components/layout'
-import { DataStorageContext } from "@/lib/data-storage-provider";
-import { LocalDataStorage } from "@/lib/local-data-storage";
-import { ApiKeyStorageContext } from "@/lib/apikey-storage-provider";
-import { ApiKeyStorage } from "@/lib/apikey-storage";
-import React from "react";
-import { ApiKeyValueContext } from "@/lib/apikey-value-provider";
-import { ChatSession } from "@/types/chattypes";
-import { ChatSessionsValueContext } from "@/lib/chat-sessions-value-provider";
-import { AIEngineStorage, AIEngineModel } from "@/lib/aiengine-storage";
-import { AIEngineValueContext } from "@/lib/aiengine-value-provider";
-import { AIEngineStorageContext } from "@/lib/aiengine-storage-provider";
+import 'typeface-roboto';
+import Layout from '../components/layout';
+import { ApiKeyContext } from "@/lib/api-key-provider";
+import { AIEngineContext } from "@/lib/aiengine-provider";
 
 export default function App({ Component, pageProps }: AppProps) {
-    
+
   const [apiKey, setApiKey] = useState<string | null>(null);
   const [aiEngine, setAiEngine] = useState<AIEngineModel>(AIEngineModel.Gpt3_5);
   const [chatSessions, setChatSessions] = useState([] as ChatSession[]);
@@ -47,7 +43,7 @@ export default function App({ Component, pageProps }: AppProps) {
     storage.addObserver((newKey) => setApiKey(newKey));
     return storage;
   }, []);
-  
+
   const aiEngineStorage = useMemo(() => {
     const storage = new AIEngineStorage();
     storage.addObserver((newAiEngine) => {
@@ -81,21 +77,15 @@ export default function App({ Component, pageProps }: AppProps) {
         <meta name="viewport" content="initial-scale=1, width=device-width" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <AIEngineValueContext.Provider value={aiEngine}>
-        <AIEngineStorageContext.Provider value={aiEngineStorage}>
-          <ApiKeyValueContext.Provider value={apiKey}>
-            <ApiKeyStorageContext.Provider value={apiKeyStorage}>
-              <DataStorageContext.Provider value={storage}>
-                <ChatSessionsValueContext.Provider value={chatSessions}>
-                <Layout>
-                  <Component {...pageProps} />
-                </Layout>
-                </ChatSessionsValueContext.Provider>
-              </DataStorageContext.Provider>
-            </ApiKeyStorageContext.Provider>
-          </ApiKeyValueContext.Provider>
-        </AIEngineStorageContext.Provider>
-      </AIEngineValueContext.Provider>
+      <AIEngineContext.Provider value={{ aiEngineStorage, aiEngine }}>
+        <ApiKeyContext.Provider value={{ apiKeyStorage, apiKey }}>
+          <ChatSessionsContext.Provider value={{ storage, chatSessions }}>
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+          </ChatSessionsContext.Provider>
+        </ApiKeyContext.Provider>
+      </AIEngineContext.Provider>
     </Fragment>
   );
 }

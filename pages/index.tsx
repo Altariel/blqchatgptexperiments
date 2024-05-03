@@ -4,10 +4,10 @@ import classNames from "classnames";
 import { useRouter } from "next/router";
 import { useContext } from "react";
 import classes from "./index.module.css";
-import { ApiKeyValueContext } from "@/lib/apikey-value-provider";
+import { ApiKeyContext } from "@/lib/api-key-provider";
 
 export default function HomePage() {
-    const apiKeyValue = useContext(ApiKeyValueContext);
+    const apiKeyValue = useContext(ApiKeyContext).apiKey;
     const router = useRouter();
 
     function handleClickChat() {

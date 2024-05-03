@@ -1,6 +1,7 @@
-import { ApiKeyStorageContext } from "@/lib/apikey-storage-provider";
-import { ApiKeyValueContext } from "@/lib/apikey-value-provider";
-import { ChatSessionsValueContext } from "@/lib/chat-sessions-value-provider";
+import { AIEngineContext } from "@/lib/aiengine-provider";
+import { AIEngineModel } from "@/lib/aiengine-storage";
+import { ApiKeyContext } from "@/lib/api-key-provider";
+import { ChatSessionsContext } from "@/lib/chat-sessions-provider";
 import HomeIcon from '@mui/icons-material/Home';
 import MenuIcon from '@mui/icons-material/Menu';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -8,24 +9,18 @@ import { Box, Button, Drawer, List, ListItem, ListItemButton } from "@mui/materi
 import classNames from "classnames";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import styles from "./navbar.module.css";
-import { DataStorageContext } from "@/lib/data-storage-provider";
-import { AIEngineValueContext } from "@/lib/aiengine-value-provider";
-import { AIEngineStorageContext } from "@/lib/aiengine-storage-provider";
-import { AIEngineModel } from "@/lib/aiengine-storage";
 import { ApiKeyDialog } from "./settingsdialog";
 
 export default function Navbar() {
   const [settingsDialogVisible, setSettingsDialogVisible] = React.useState(false);
-  const apiKeyValue = useContext(ApiKeyValueContext);
-  const aiEngineModelValue = useContext(AIEngineValueContext);
   const [openDrawer, setOpenDrawer] = React.useState(false);
-  
-  const dataStorageContext = useContext(DataStorageContext);
-  const history = useContext(ChatSessionsValueContext);
-  const apiKeyStorageContext = useContext(ApiKeyStorageContext);  
-  const aiEngineStorageContext = useContext(AIEngineStorageContext);  
+
+  const { storage, chatSessions } = useContext(ChatSessionsContext);
+  const { apiKeyStorage, apiKey: apiKeyValue } = useContext(ApiKeyContext);
+
+  const { aiEngineStorage, aiEngine } = useContext(AIEngineContext);
 
   const router = useRouter();
 
@@ -39,10 +34,8 @@ export default function Navbar() {
 
   function hideSettingsHandler(newKey: string, newAiEngine: AIEngineModel) {
     setSettingsDialogVisible(false);
-    apiKeyStorageContext.setAPIKey(newKey);
-
-    //
-    aiEngineStorageContext.setAIEngine(newAiEngine);
+    apiKeyStorage.setAPIKey(newKey);
+    aiEngineStorage.setAIEngine(newAiEngine);
   }
 
   function getPageName() {
@@ -63,7 +56,7 @@ export default function Navbar() {
   }
 
   const clearHistoryHandler = () => {
-    void dataStorageContext.clear();
+    void storage.clear();
   }
 
   const DrawerList = (
@@ -74,14 +67,14 @@ export default function Navbar() {
     >
       <h2>History</h2>
       <List>
-        {history?.map((chatSession, index) => {
+        {chatSessions?.map((chatSession, index) => {
           return (
             <ListItem key={chatSession.id + "-" + index} disablePadding>
               <ListItemButton onClick={handleItemClick}>
                 <Link
                   href={{
                     pathname: "/chat",
-                    query: {id: chatSession.id}, // the data
+                    query: { id: chatSession.id }, // the data
                   }}
                 >
                   {chatSession.id}
@@ -92,7 +85,7 @@ export default function Navbar() {
         })}
       </List>
 
-      {history && (
+      {chatSessions && (
         <Button
           fullWidth
           size="large"
@@ -114,7 +107,7 @@ export default function Navbar() {
             open={settingsDialogVisible}
             onClose={hideSettingsHandler}
             currentKey={apiKeyValue || ""}
-            currentAiEngineModel={aiEngineModelValue}
+            currentAiEngineModel={aiEngine}
           />
         )}
         <div className={styles.leftIcons}>
