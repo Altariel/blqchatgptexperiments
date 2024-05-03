@@ -23,12 +23,31 @@ import { AIEngineValueContext } from "@/lib/aiengine-value-provider";
 import { AIEngineStorageContext } from "@/lib/aiengine-storage-provider";
 
 export default function App({ Component, pageProps }: AppProps) {
-  const storage = new LocalDataStorage();
+    
+  const [apiKey, setApiKey] = useState<string | null>(null);
+  const [aiEngine, setAiEngine] = useState<AIEngineModel>(AIEngineModel.Gpt3_5);
+  const [chatSessions, setChatSessions] = useState([] as ChatSession[]);
+
+  const storage = useMemo(() => {
+    const dataStorage = new LocalDataStorage();
+    dataStorage.addObserver(() => {
+      async function updateMessages() {
+        const chatSessions = await dataStorage.getAll();
+        setChatSessions(chatSessions);
+      }
+
+      updateMessages();
+    });
+
+    return dataStorage;
+  }, []);
+
   const apiKeyStorage = useMemo(() => {
     const storage = new ApiKeyStorage();
     storage.addObserver((newKey) => setApiKey(newKey));
     return storage;
   }, []);
+  
   const aiEngineStorage = useMemo(() => {
     const storage = new AIEngineStorage();
     storage.addObserver((newAiEngine) => {
@@ -36,23 +55,7 @@ export default function App({ Component, pageProps }: AppProps) {
     });
     return storage;
   }, []);
-  const [apiKey, setApiKey] = useState<string | null>(null);
-  const [aiEngine, setAiEngine] = useState<AIEngineModel>(AIEngineModel.Gpt3_5);
-  const [chatSessions, setChatSessions] = useState([] as ChatSession[]);
 
-  // useEffect che carica la roba dallo storage, con funzione asincrona
-  // poi lo setta nello state
-  // il provider lo passa a tutti i figli
-  storage.addObserver(() => {
-    async function updateMessages() {
-      const chatSessions = await storage.getAll();
-      setChatSessions(chatSessions);
-    }
-
-
-    updateMessages();
-  });
-  
   useEffect(() => {
     setApiKey(apiKeyStorage.getAPIKey());
     setAiEngine(aiEngineStorage.getAIEngine());
@@ -83,9 +86,11 @@ export default function App({ Component, pageProps }: AppProps) {
           <ApiKeyValueContext.Provider value={apiKey}>
             <ApiKeyStorageContext.Provider value={apiKeyStorage}>
               <DataStorageContext.Provider value={storage}>
+                <ChatSessionsValueContext.Provider value={chatSessions}>
                 <Layout>
                   <Component {...pageProps} />
                 </Layout>
+                </ChatSessionsValueContext.Provider>
               </DataStorageContext.Provider>
             </ApiKeyStorageContext.Provider>
           </ApiKeyValueContext.Provider>
