@@ -13,7 +13,7 @@ import styles from "./navbar.module.css";
 import { DataStorageContext } from "@/lib/data-storage-provider";
 import { AIEngineValueContext } from "@/lib/aiengine-value-provider";
 import { AIEngineStorageContext } from "@/lib/aiengine-storage-provider";
-import { AIEngineModel } from "@/lib/aiengine-storage";
+import { AIEngineModel, getAIEngineModelString } from "@/lib/aiengine-storage";
 import { ApiKeyDialog } from "./settingsdialog";
 
 export default function Navbar() {
@@ -117,17 +117,33 @@ export default function Navbar() {
             currentAiEngineModel={aiEngineModelValue}
           />
         )}
-        <div className={styles.leftIcons}>
-          <MenuIcon className={classNames(styles.menuIcon, styles.button)} onClick={toggleDrawer(true)} />
-          {router.pathname != "/" && (
-            <HomeIcon onClick={homeIconHandler} className={styles.button} />
-          )}
+        <div className={styles.box}>
+          <span>
+            <MenuIcon
+              className={classNames(styles.menuIcon, styles.button)}
+              onClick={toggleDrawer(true)}
+            />
+            {router.pathname != "/" && (
+              <HomeIcon onClick={homeIconHandler} className={styles.button} />
+            )}
+          </span>
         </div>
-        <h1>AI Aiutami tu {getPageName()}</h1>
-        <SettingsIcon
-          onClick={showSettingsHandler}
-          className={styles.button}
-        />
+        <div className={styles.box}>
+          <span>
+            <h1>AI Aiutami tu {getPageName()}</h1>
+          </span>
+        </div>
+        <div className={styles.box}>
+          <span className={styles.rightIcons}>
+            <h4 className={styles.marginRight}>
+              GPT Model: {getAIEngineModelString(aiEngineModelValue)}
+            </h4>
+            <SettingsIcon
+              onClick={showSettingsHandler}
+              className={styles.button}
+            />
+          </span>
+        </div>
       </div>
       <Drawer anchor="left" open={openDrawer} onClose={toggleDrawer(false)}>
         {DrawerList}

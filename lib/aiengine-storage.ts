@@ -27,7 +27,10 @@ export class AIEngineStorage implements IAIEngineStorage {
 
   getAIEngine(): AIEngineModel {
     if (typeof window !== "undefined") {
-      return localStorage.getItem(AI_ENGINE_STORAGE) as AIEngineModel;
+      const savedEngine = localStorage.getItem(AI_ENGINE_STORAGE) as AIEngineModel;
+      if (Object.values(AIEngineModel).includes(savedEngine)) {
+        return savedEngine;
+      }
     }
     return AIEngineModel.Gpt3_5;
   }
