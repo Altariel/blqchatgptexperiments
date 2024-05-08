@@ -58,7 +58,7 @@ export default function Chat() {
     setInput("");
 
     const newMessages = messages.concat([{ id: messages.length + 1, content: message, role: OpenAIRole.User, timestamp: Date.now() }]);
-
+    setMessages(newMessages);
     if (!apiKey) {
       newMessages.push({ id: newMessages.length + 1, content: "API Key not set", role: CustomRole.Application, timestamp: Date.now() });
       setMessages(newMessages);
