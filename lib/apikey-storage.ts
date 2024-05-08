@@ -27,17 +27,14 @@ export class ApiKeyStorage implements IAPIKeyStorage {
     }
   }
 
-  // Register an observer callback
   addObserver(callback: (apiKey: string | null) => void) {
     this.observers.push(callback);
   }
 
-  // Remove an observer callback
   removeObserver(callback: (apiKey: string | null) => void) {
     this.observers = this.observers.filter(observer => observer !== callback);
   }
 
-  // Notify all observers
   private notifyObservers() {
     this.observers.forEach(observer => observer(this.apiKey));
   }

@@ -18,21 +18,59 @@ import React from "react";
 import { ApiKeyValueContext } from "@/lib/apikey-value-provider";
 import { ThemeProvider } from "@mui/material";
 import theme from "./theme";
+import { ChatSession } from "@/types/chattypes";
+import { ChatSessionsValueContext } from "@/lib/chat-sessions-value-provider";
+import { AIEngineStorage, AIEngineModel } from "@/lib/aiengine-storage";
+import { AIEngineValueContext } from "@/lib/aiengine-value-provider";
+import { AIEngineStorageContext } from "@/lib/aiengine-storage-provider";
 
 export default function App({ Component, pageProps }: AppProps) {
-  const storage = new LocalDataStorage();
-  const apiKeyStorage = useMemo(() => new ApiKeyStorage(), []);
+    
   const [apiKey, setApiKey] = useState<string | null>(null);
+  const [aiEngine, setAiEngine] = useState<AIEngineModel>(AIEngineModel.Gpt3_5);
+  const [chatSessions, setChatSessions] = useState([] as ChatSession[]);
 
-  apiKeyStorage.addObserver((newKey) => setApiKey(newKey));
+  const storage = useMemo(() => {
+    const dataStorage = new LocalDataStorage();
+    dataStorage.addObserver(() => {
+      async function updateMessages() {
+        const chatSessions = await dataStorage.getAll();
+        setChatSessions(chatSessions);
+      }
 
-  // useEffect che carica la roba dalo storage, con funzione asincrona
-  // poi lo setta nello state
-  // il provider lo passa a tutti i figli
+      updateMessages();
+    });
+
+    return dataStorage;
+  }, []);
+
+  const apiKeyStorage = useMemo(() => {
+    const storage = new ApiKeyStorage();
+    storage.addObserver((newKey) => setApiKey(newKey));
+    return storage;
+  }, []);
+  
+  const aiEngineStorage = useMemo(() => {
+    const storage = new AIEngineStorage();
+    storage.addObserver((newAiEngine) => {
+      setAiEngine(newAiEngine);
+    });
+    return storage;
+  }, []);
 
   useEffect(() => {
     setApiKey(apiKeyStorage.getAPIKey());
-  }, [apiKeyStorage]);
+    setAiEngine(aiEngineStorage.getAIEngine());
+  }, [apiKeyStorage, aiEngineStorage]);
+
+  useEffect(() => {
+    async function fetchData() {
+      const chatSessions = await storage.getAll();
+      setChatSessions(chatSessions);
+    }
+
+    fetchData();
+  }, [storage]);
 
   return (
     <Fragment><ThemeProvider theme={theme}>
@@ -46,15 +84,21 @@ export default function App({ Component, pageProps }: AppProps) {
           <meta name="viewport" content="initial-scale=1, width=device-width" />
           <link rel="icon" href="/favicon.ico" />
         </Head>
-        <ApiKeyValueContext.Provider value={apiKey}>
-          <ApiKeyStorageContext.Provider value={apiKeyStorage}>
-            <DataStorageContext.Provider value={storage}>
-              <Layout>
-                <Component {...pageProps} />
-              </Layout>
-            </DataStorageContext.Provider>
-          </ApiKeyStorageContext.Provider>
-        </ApiKeyValueContext.Provider>
+        <AIEngineValueContext.Provider value={aiEngine}>
+        <AIEngineStorageContext.Provider value={aiEngineStorage}>
+          <ApiKeyValueContext.Provider value={apiKey}>
+              <ApiKeyStorageContext.Provider value={apiKeyStorage}>
+                <DataStorageContext.Provider value={storage}>
+                  <ChatSessionsValueContext.Provider value={chatSessions}>
+                <Layout>
+                    <Component {...pageProps} />
+                  </Layout>
+                  </ChatSessionsValueContext.Provider>
+              </DataStorageContext.Provider>
+              </ApiKeyStorageContext.Provider>
+            </ApiKeyValueContext.Provider>
+        </AIEngineStorageContext.Provider>
+      </AIEngineValueContext.Provider>
     </ThemeProvider>
     </Fragment>
   );

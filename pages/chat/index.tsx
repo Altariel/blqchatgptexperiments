@@ -1,14 +1,16 @@
 import Button from '@mui/material/Button';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 
 import ChatMessage from '@/components/chatmessage';
-import { Message, OpenAIRole, CustomRole } from '@/types/chattypes';
+import { AIEngineValueContext } from '@/lib/aiengine-value-provider';
+import { CustomRole, Message, OpenAIRole, getChatSessionId } from '@/types/chattypes';
 import SendIcon from '@mui/icons-material/Send';
 import { Box, Grid } from '@mui/material';
 import TextField from '@mui/material/TextField';
-import { chat, isOpenApiError } from '@/lib/openai-utils';
 import { useRouter } from 'next/router';
 import { ApiKeyValueContext } from '@/lib/apikey-value-provider';
+import { DataStorageContext } from '@/lib/data-storage-provider';
+import { chat, isOpenApiError } from '@/lib/openai-utils';
 
 export default function Chat() {
   const [messages, setMessages] = React.useState<Message[]>([
@@ -29,10 +31,22 @@ export default function Chat() {
 
   const router = useRouter();
   const apiKey = useContext(ApiKeyValueContext);
+  const dataStorageContext = useContext(DataStorageContext);
+  const aiEngineModel = useContext(AIEngineValueContext);
 
-  // TODO: recover messages if this is not null
-  const data = router.query;
+  useEffect(() => {
+    async function fetchData() {
+      const data = router.query;
+      if (data.id) {
+        const oldMessages = await dataStorageContext.get(data.id as string);
+        if (oldMessages) {
+          setMessages(oldMessages.messages);
+        }
+      }
+    }
 
+    fetchData();
+  }, [router.query, dataStorageContext]);
 
   // TODO: set che chat model
 
@@ -44,34 +58,40 @@ export default function Chat() {
     setInput("");
 
     const newMessages = messages.concat([{ id: messages.length + 1, content: message, role: OpenAIRole.User, timestamp: Date.now() }]);
-    setMessages(newMessages)
 
     if (!apiKey) {
-      setMessages(mess => mess.concat([{ id: mess.length + 1, content: "API Key not set", role: CustomRole.Application, timestamp: Date.now() }]))
+      newMessages.push({ id: newMessages.length + 1, content: "API Key not set", role: CustomRole.Application, timestamp: Date.now() });
+      setMessages(newMessages);
       return;
     }
     
-    const response = await chat(apiKey, newMessages);
+    const response = await chat(apiKey, aiEngineModel, newMessages);
     if (!isOpenApiError(response)) {
-      setMessages(mess => mess.concat([{ id: mess.length + 1, content: response, role: OpenAIRole.Assistant, timestamp: Date.now() }]))
-      // TODO!!!
-      //setHistory(input.trim());
+      newMessages.push({ id: newMessages.length + 1, content: response, role: OpenAIRole.Assistant, timestamp: Date.now() });
+      setMessages(newMessages);
+
+      dataStorageContext.set({
+        id: getChatSessionId(newMessages),
+        messages: newMessages
+      });
     }
     else {
       setMessages(mess => mess.concat([{ id: mess.length + 1, content: response.message, role: OpenAIRole.Assistant, timestamp: Date.now() }]))
     }
   }
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setInput(event.target.value);
-  };
-
-  const handleOnKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       event.preventDefault();
       handleSendToAI();
     }
-  }
+  };
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(event.target.value);
+  };
+
+  const messagesToDisplay = messages.filter((m) => m.role !== OpenAIRole.System);
 
   return (
     <Box
@@ -86,7 +106,7 @@ export default function Chat() {
       <Box
         sx={{ flexGrow: 1, overflow: "auto", p: 2 }}
       >
-        {messages.map((message) => (
+        {messagesToDisplay.map((message) => (
           <ChatMessage key={message.id} {...message} />
         ))}
       </Box>
@@ -98,7 +118,7 @@ export default function Chat() {
               placeholder="Type a message"
               value={input}
               onChange={handleInputChange}
-              onKeyDown={handleOnKeyDown}
+              onKeyDown={handleKeyDown}
             />
           </Grid>
           <Grid item xs={2}>

@@ -1,5 +1,8 @@
+import styles from "./chatmessage.module.css";
+import React from "react";
 import { Box, Paper, Typography } from "@mui/material";
 import { Role, Message, OpenAIRole } from "@/types/chattypes";
+import { MuiMarkdown, getOverrides } from 'mui-markdown';
 export default function ChatMessage(message: Message) {
     return (
       <Box
@@ -20,7 +23,24 @@ export default function ChatMessage(message: Message) {
                 : "primary.light",
           }}
         >
-          <Typography variant="body1">{message.content}</Typography>
+          <Typography>
+            <MuiMarkdown
+            overrides={{
+              ...getOverrides({}), // This will keep the other default overrides.
+              ul: {
+                props: {
+                  style: {  paddingLeft: "1em"  },
+                },
+              },
+              ol: {
+                props: {
+                  style: {  paddingLeft: "1.5em"  },
+                },
+              },
+            }}
+          >
+             {message.content}</MuiMarkdown>
+          </Typography>
         </Paper>
       </Box>
     );
