@@ -1,26 +1,101 @@
+import { AIEngineModel } from "@/lib/aiengine-storage";
+import { AIEngineStorageContext } from "@/lib/aiengine-storage-provider";
+import { AIEngineValueContext } from "@/lib/aiengine-value-provider";
 import { ApiKeyStorageContext } from "@/lib/apikey-storage-provider";
 import { ApiKeyValueContext } from "@/lib/apikey-value-provider";
 import { ChatSessionsValueContext } from "@/lib/chat-sessions-value-provider";
+import { DataStorageContext } from "@/lib/data-storage-provider";
 import HomeIcon from '@mui/icons-material/Home';
 import MenuIcon from '@mui/icons-material/Menu';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { Box, Button, Drawer, List, ListItem, ListItemButton } from "@mui/material";
+import { Box, Button, Drawer, List, ListItem, ListItemButton, MenuItem, TextField, styled } from "@mui/material";
 import classNames from "classnames";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useContext, useEffect } from "react";
 import styles from "./navbar.module.css";
-import { DataStorageContext } from "@/lib/data-storage-provider";
-import { AIEngineValueContext } from "@/lib/aiengine-value-provider";
-import { AIEngineStorageContext } from "@/lib/aiengine-storage-provider";
-import { AIEngineModel, getAIEngineModelString } from "@/lib/aiengine-storage";
 import { ApiKeyDialog } from "./settingsdialog";
+
+// why this is not working?
+import { ThemeProvider } from "@mui/material";
+import { createTheme } from "@mui/material/styles";
+
+//
+
+const theme = createTheme({
+  components: {
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '& label': {
+            color: 'white',
+          },
+          '& label.Mui-focused': {
+            color: 'white',
+          },
+          '& .MuiInput-underline:after': {
+            borderBottomColor: 'yellow',
+          },
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              borderColor: 'white',
+            },
+            '&:hover fieldset': {
+              borderColor: 'white',
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: 'red',
+            },  
+            '& ': {
+              color: 'white', // Change the color here
+              width: '150px'
+            }, 
+            '& .MuiSelect-icon': {
+              color: 'white', // Change the color here
+            },                  
+          },                         
+        },
+      },
+    },
+  },
+});
+
+
+// const CssTextField = styled(TextField)({
+//   root: {
+//     '& label': {
+//       color: 'red',
+//     },
+//     '& label.Mui-focused': {
+//       color: 'white',
+//     },
+//     '& .MuiInput-underline:after': {
+//       borderBottomColor: 'yellow',
+//     },
+//     '& .MuiOutlinedInput-root': {
+//       '& fieldset': {
+//         borderColor: 'white',
+//       },
+//       '&:hover fieldset': {
+//         borderColor: 'white',
+//       },
+//       '&.Mui-focused fieldset': {
+//         borderColor: 'yellow',
+//       },
+//       '& input': {
+//         color: 'blue', // Change the color here
+//       },
+//     },
+//   },
+// });
 
 export default function Navbar() {
   const [settingsDialogVisible, setSettingsDialogVisible] = React.useState(false);
   const apiKeyValue = useContext(ApiKeyValueContext);
   const aiEngineModelValue = useContext(AIEngineValueContext);
   const [openDrawer, setOpenDrawer] = React.useState(false);
+  const [aiEngine, setAiEngine] = React.useState<AIEngineModel>(aiEngineModelValue);
+
   
   const dataStorageContext = useContext(DataStorageContext);
   const history = useContext(ChatSessionsValueContext);
@@ -36,6 +111,10 @@ export default function Navbar() {
   function homeIconHandler() {
     router.push("/");
   }
+
+  useEffect(() => {
+    aiEngineStorageContext.setAIEngine(aiEngine);    
+  }, [aiEngine]);
 
   function hideSettingsHandler(newKey: string, newAiEngine: AIEngineModel) {
     setSettingsDialogVisible(false);
@@ -107,6 +186,7 @@ export default function Navbar() {
   );
 
   return (
+    <ThemeProvider theme={theme}>
     <div className={styles.mainDiv}>
       <div className={styles.navbar}>
         {settingsDialogVisible && (
@@ -134,10 +214,18 @@ export default function Navbar() {
           </span>
         </div>
         <div className={styles.box}>
-          <span className={styles.rightIcons}>
-            <h4 className={styles.marginRight}>
-              GPT Model: {getAIEngineModelString(aiEngineModelValue)}
-            </h4>
+          <span className={styles.rightIcons}>          
+            <TextField
+            id="select-ai-engine"
+            value={aiEngine}
+            label="AI Engine Model"
+            onChange={(e) => setAiEngine(e.target.value as AIEngineModel)}
+            className={styles.combo}
+            select
+          >
+            <MenuItem value={AIEngineModel.Gpt3_5}>GPT 3.5 Turbo</MenuItem>
+            <MenuItem value={AIEngineModel.Gpt4}>GPT 4</MenuItem>
+          </TextField>
             <SettingsIcon
               onClick={showSettingsHandler}
               className={styles.button}
@@ -149,5 +237,6 @@ export default function Navbar() {
         {DrawerList}
       </Drawer>
     </div>
+    </ThemeProvider>
   );
 }

@@ -27,7 +27,7 @@
 .rightIcons {
     display: flex;
     justify-content: space-between;
-    align-items: center
+    align-items: center;
 }
 
 .marginRight {
@@ -40,7 +40,15 @@
     justify-content: center;
   }
   
-  .box:first-child > span { margin-right: auto; }
-  
-  .box:last-child  > span { margin-left: auto;  }
-  
+.box:first-child > span { margin-right: auto; }
+
+.box:last-child  > span { margin-left: auto;  }
+
+.combo {
+    margin-right: 20px;
+    color: white;    
+}
+
+.combo:hover {
+    color: red;
+}

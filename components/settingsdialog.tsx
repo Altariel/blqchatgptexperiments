@@ -37,7 +37,7 @@ export function ApiKeyDialog(props: ApiKeyDialogProps) {
 
     const onClose = () => {
         props.onClose(key, aiEngine);
-    }
+    }    
 
     return (
       <Dialog onClose={onClose} open={props.open}>
@@ -64,18 +64,7 @@ export function ApiKeyDialog(props: ApiKeyDialogProps) {
             <button type="submit" onClick={onEdit}>
               {isEditing ? "Done" : "Edit"}
             </button>
-          </div>
-          <TextField
-            id="select-ai-engine"
-            value={aiEngine}
-            label="AI Engine Model"
-            onChange={(e) => setAiEngine(e.target.value as AIEngineModel)}
-            className={classes.combo}
-            select
-          >
-            <MenuItem value={AIEngineModel.Gpt3_5}>GPT 3.5 Turbo</MenuItem>
-            <MenuItem value={AIEngineModel.Gpt4}>GPT 4</MenuItem>
-          </TextField>
+          </div>         
         </div>
       </Dialog>
     );
