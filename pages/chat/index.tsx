@@ -11,6 +11,9 @@ import { useRouter } from 'next/router';
 import { ApiKeyValueContext } from '@/lib/apikey-value-provider';
 import { DataStorageContext } from '@/lib/data-storage-provider';
 import { chat, isOpenApiError } from '@/lib/openai-utils';
+import Image from 'next/image';
+
+import thinkingGif from '@/public/thinking.gif';
 
 export default function Chat() {
   const [messages, setMessages] = React.useState<Message[]>([
@@ -28,7 +31,7 @@ export default function Chat() {
     }
   ]);
   const [input, setInput] = React.useState("");
-
+  const [showBubble, setShowBubble] = React.useState(false);
   const router = useRouter();
   const apiKey = useContext(ApiKeyValueContext);
   const dataStorageContext = useContext(DataStorageContext);
@@ -51,11 +54,13 @@ export default function Chat() {
   // TODO: set che chat model
 
   async function handleSendToAI() {
+
     const message = input.trim();
     if (message === "") {
       return;
     }
     setInput("");
+    setShowBubble(true)
 
     const newMessages = messages.concat([{ id: messages.length + 1, content: message, role: OpenAIRole.User, timestamp: Date.now() }]);
     setMessages(newMessages);
@@ -66,6 +71,7 @@ export default function Chat() {
     }
     
     const response = await chat(apiKey, aiEngineModel, newMessages);
+    setShowBubble(false);
     if (!isOpenApiError(response)) {
       newMessages.push({ id: newMessages.length + 1, content: response, role: OpenAIRole.Assistant, timestamp: Date.now() });
       setMessages(newMessages);
@@ -107,7 +113,9 @@ export default function Chat() {
       >
         {messagesToDisplay.map((message) => (
           <ChatMessage key={message.id} {...message} />
+          
         ))}
+        {showBubble && <Image src={thinkingGif} alt="thinking" />}
       </Box>
       <Box sx={{ p: 2, backgroundColor: "background.default" }}>
         <Grid container spacing={2}>
@@ -137,23 +145,4 @@ export default function Chat() {
       </Box>
     </Box>
   );
-
-  // return (
-  //   <div className={styles.main}>
-  //     <h1>Chat</h1>
-  //     <div> model: "gpt-3.5-turbo"</div>
-  //     <form>
-  //       <div className={styles.label}>
-  //         <label htmlFor='api-key'>API Key</label>
-  //         <input className={styles.input} id="api-key" ref={inputAPIKeyRef} type="text" />
-  //       </div>
-  //       <div className={styles.label}>
-  //         <label htmlFor='query'>Query</label>
-  //         <input className={styles.input} id="query" ref={queryRef} type="text" defaultValue="Chi e' il presidente degli stati uniti?" />
-  //       </div>
-  //       <div><button onClick={handleSendToAI} >Go</button></div>
-  //       <div>{chatGPTAnswer}</div>
-  //     </form>
-  //   </div>
-  // )
 }
