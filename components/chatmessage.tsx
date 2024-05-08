@@ -23,7 +23,7 @@ export default function ChatMessage(message: Message) {
                 : "primary.light",
           }}
         >
-          <Typography>
+          <Typography component={"div"}>
             <MuiMarkdown
             overrides={{
               ...getOverrides({}), // This will keep the other default overrides.
