@@ -10,7 +10,10 @@ import { CustomRole, Message, OpenAIRole, getChatSessionId } from '@/types/chatt
 import SendIcon from '@mui/icons-material/Send';
 import { Box, Grid } from '@mui/material';
 import TextField from '@mui/material/TextField';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
+
+import thinkingGif from '@/public/thinking.gif';
 
 export default function Chat() {
   const [messages, setMessages] = React.useState<Message[]>([
@@ -28,7 +31,7 @@ export default function Chat() {
     }
   ]);
   const [input, setInput] = React.useState("");
-
+  const [showBubble, setShowBubble] = React.useState(false);
   const router = useRouter();
   const apiKey = useContext(ApiKeyContext).apiKey;
   const { storage, chatSessions } = useContext(ChatSessionsContext);
@@ -51,21 +54,24 @@ export default function Chat() {
   // TODO: set che chat model
 
   async function handleSendToAI() {
+
     const message = input.trim();
     if (message === "") {
       return;
     }
     setInput("");
+    setShowBubble(true)
 
     const newMessages = messages.concat([{ id: messages.length + 1, content: message, role: OpenAIRole.User, timestamp: Date.now() }]);
-
+    setMessages(newMessages);
     if (!apiKey) {
       newMessages.push({ id: newMessages.length + 1, content: "API Key not set", role: CustomRole.Application, timestamp: Date.now() });
       setMessages(newMessages);
       return;
     }
-
     const response = await chat(apiKey, aiEngine, newMessages);
+
+    setShowBubble(false);
     if (!isOpenApiError(response)) {
       newMessages.push({ id: newMessages.length + 1, content: response, role: OpenAIRole.Assistant, timestamp: Date.now() });
       setMessages(newMessages);
@@ -98,16 +104,19 @@ export default function Chat() {
       sx={{
         display: "flex",
         flexDirection: "column",
-        backgroundColor: "red",
+        backgroundColor: "#F8F8F8",
+        // flex: "1 1 auto",
         height: "100%"
       }}
     >
       <Box
-        sx={{ flexGrow: 1, overflow: "auto", p: 2, backgroundColor: "blue" }}
+        sx={{ flexGrow: 1, overflow: "auto", p: 2 }}
       >
         {messagesToDisplay.map((message) => (
           <ChatMessage key={message.id} {...message} />
+          
         ))}
+        {showBubble && <Image src={thinkingGif} alt="thinking" />}
       </Box>
       <Box sx={{ p: 2, backgroundColor: "background.default" }}>
         <Grid container spacing={2}>

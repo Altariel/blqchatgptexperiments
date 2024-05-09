@@ -1,6 +1,8 @@
 'use client';
 
+import { AIEngineContext } from "@/lib/aiengine-provider";
 import { AIEngineModel, AIEngineStorage } from "@/lib/aiengine-storage";
+import { ApiKeyContext } from "@/lib/api-key-provider";
 import { ApiKeyStorage } from "@/lib/apikey-storage";
 import { ChatSessionsContext } from "@/lib/chat-sessions-provider";
 import { LocalDataStorage } from "@/lib/local-data-storage";
@@ -10,13 +12,13 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
+import { ThemeProvider } from "@mui/material";
 import type { AppProps } from "next/app";
 import Head from "next/head";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import 'typeface-roboto';
 import Layout from '../components/layout';
-import { ApiKeyContext } from "@/lib/api-key-provider";
-import { AIEngineContext } from "@/lib/aiengine-provider";
+import theme from "./theme";
 
 export default function App({ Component, pageProps }: AppProps) {
 
@@ -66,8 +68,8 @@ export default function App({ Component, pageProps }: AppProps) {
     fetchData();
   }, [storage]);
 
-  return (
-    <Fragment>
+  return (<Fragment>
+      <ThemeProvider theme={theme}>
       <Head>
         <title>BLQ Chat</title>
         <meta
@@ -86,6 +88,7 @@ export default function App({ Component, pageProps }: AppProps) {
           </ChatSessionsContext.Provider>
         </ApiKeyContext.Provider>
       </AIEngineContext.Provider>
+    </ThemeProvider>
     </Fragment>
   );
 }
