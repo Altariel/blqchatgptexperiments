@@ -16,6 +16,8 @@ import { ApiKeyStorageContext } from "@/lib/apikey-storage-provider";
 import { ApiKeyStorage } from "@/lib/apikey-storage";
 import React from "react";
 import { ApiKeyValueContext } from "@/lib/apikey-value-provider";
+import { ThemeProvider } from "@mui/material";
+import theme from "./theme";
 import { ChatSession } from "@/types/chattypes";
 import { ChatSessionsValueContext } from "@/lib/chat-sessions-value-provider";
 import { AIEngineStorage, AIEngineModel } from "@/lib/aiengine-storage";
@@ -71,31 +73,33 @@ export default function App({ Component, pageProps }: AppProps) {
   }, [storage]);
 
   return (
-    <Fragment>
-      <Head>
-        <title>BLQ Chat</title>
-        <meta
-          name="description"
-          content="A web app that does the ChatGPT queries for you"
-        />
-        <meta name="viewport" content="initial-scale=1, width=device-width" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <AIEngineValueContext.Provider value={aiEngine}>
+    <Fragment><ThemeProvider theme={theme}>
+      
+        <Head>
+          <title>BLQ Chat</title>
+          <meta
+            name="description"
+            content="A web app that does the ChatGPT queries for you"
+          />
+          <meta name="viewport" content="initial-scale=1, width=device-width" />
+          <link rel="icon" href="/favicon.ico" />
+        </Head>
+        <AIEngineValueContext.Provider value={aiEngine}>
         <AIEngineStorageContext.Provider value={aiEngineStorage}>
           <ApiKeyValueContext.Provider value={apiKey}>
-            <ApiKeyStorageContext.Provider value={apiKeyStorage}>
-              <DataStorageContext.Provider value={storage}>
-                <ChatSessionsValueContext.Provider value={chatSessions}>
+              <ApiKeyStorageContext.Provider value={apiKeyStorage}>
+                <DataStorageContext.Provider value={storage}>
+                  <ChatSessionsValueContext.Provider value={chatSessions}>
                 <Layout>
-                  <Component {...pageProps} />
-                </Layout>
-                </ChatSessionsValueContext.Provider>
+                    <Component {...pageProps} />
+                  </Layout>
+                  </ChatSessionsValueContext.Provider>
               </DataStorageContext.Provider>
-            </ApiKeyStorageContext.Provider>
-          </ApiKeyValueContext.Provider>
+              </ApiKeyStorageContext.Provider>
+            </ApiKeyValueContext.Provider>
         </AIEngineStorageContext.Provider>
       </AIEngineValueContext.Provider>
+    </ThemeProvider>
     </Fragment>
   );
 }
