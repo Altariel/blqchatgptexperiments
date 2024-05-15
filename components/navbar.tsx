@@ -1,24 +1,21 @@
-import { AIChatEngineModel, AIEnginesType } from "@/lib/aiengine-storage";
-import { AIEngineStorageContext } from "@/lib/aiengine-storage-provider";
-import { AIEnginesValueContext } from "@/lib/aiengine-value-provider";
-import { ApiKeyStorageContext } from "@/lib/apikey-storage-provider";
-import { ApiKeyValueContext } from "@/lib/apikey-value-provider";
-import { ChatSessionsValueContext } from "@/lib/chat-sessions-value-provider";
-import { DataStorageContext } from "@/lib/data-storage-provider";
+import { AIEnginesContext } from "@/lib/aiengine-provider";
+import { ApiKeyContext } from "@/lib/api-key-provider";
+import { ChatSessionsContext } from "@/lib/chat-sessions-provider";
 import HomeIcon from '@mui/icons-material/Home';
 import MenuIcon from '@mui/icons-material/Menu';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { Box, Button, Drawer, List, ListItem, ListItemButton, MenuItem, TextField, styled } from "@mui/material";
+import { Box, Button, Drawer, List, ListItem, ListItemButton, TextField } from "@mui/material";
 import classNames from "classnames";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import styles from "./navbar.module.css";
-import { ApiKeyDialog, CurrentPage, getEngineModelForPage, modelToString as engineModelToString, pageToModelLabel } from "./settingsdialog";
+import { ApiKeyDialog, CurrentPage, getEngineModelForPage, pageToModelLabel } from "./settingsdialog";
 
 // why this is not working?
 import { ThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
+import { AIEnginesType } from "@/lib/aiengine-storage";
 
 //
 
@@ -59,48 +56,14 @@ const theme = createTheme({
     },
   },
 });
-
-
-// const CssTextField = styled(TextField)({
-//   root: {
-//     '& label': {
-//       color: 'red',
-//     },
-//     '& label.Mui-focused': {
-//       color: 'white',
-//     },
-//     '& .MuiInput-underline:after': {
-//       borderBottomColor: 'yellow',
-//     },
-//     '& .MuiOutlinedInput-root': {
-//       '& fieldset': {
-//         borderColor: 'white',
-//       },
-//       '&:hover fieldset': {
-//         borderColor: 'white',
-//       },
-//       '&.Mui-focused fieldset': {
-//         borderColor: 'yellow',
-//       },
-//       '& input': {
-//         color: 'blue', // Change the color here
-//       },
-//     },
-//   },
-// });
-
 export default function Navbar() {
-  const [settingsDialogVisible, setSettingsDialogVisible] =
-    React.useState(false);
-  const apiKeyValue = useContext(ApiKeyValueContext);
-  const aiEnginesModelValue = useContext(AIEnginesValueContext);
+  const [settingsDialogVisible, setSettingsDialogVisible] = React.useState(false);
   const [openDrawer, setOpenDrawer] = React.useState(false);
-  // const [aiEngines, setAiEngines] = React.useState<AIEnginesType>(aiEnginesModelValue);
 
-  const dataStorageContext = useContext(DataStorageContext);
-  const history = useContext(ChatSessionsValueContext);
-  const apiKeyStorageContext = useContext(ApiKeyStorageContext);
-  const aiEngineStorageContext = useContext(AIEngineStorageContext);
+  const { storage, chatSessions } = useContext(ChatSessionsContext);
+  const { apiKeyStorage, apiKey: apiKeyValue } = useContext(ApiKeyContext);
+
+  const { aiEnginesStorage, aiEngines } = useContext(AIEnginesContext);
 
   const router = useRouter();
 
@@ -118,10 +81,8 @@ export default function Navbar() {
 
   function hideSettingsHandler(newKey: string, newAiEngines: AIEnginesType) {
     setSettingsDialogVisible(false);
-    apiKeyStorageContext.setAPIKey(newKey);
-
-    //
-    aiEngineStorageContext.setAIEngines(newAiEngines);
+    apiKeyStorage.setAPIKey(newKey);
+    aiEnginesStorage.setAIEngines(newAiEngines);
   }
 
   function getPageName() {
@@ -142,8 +103,8 @@ export default function Navbar() {
   };
 
   const clearHistoryHandler = () => {
-    void dataStorageContext.clear();
-  };
+    void storage.clear();
+  }
 
   const DrawerList = (
     <Box
@@ -153,7 +114,7 @@ export default function Navbar() {
     >
       <h2>History</h2>
       <List>
-        {history?.map((chatSession, index) => {
+        {chatSessions?.map((chatSession, index) => {
           return (
             <ListItem key={chatSession.id + "-" + index} disablePadding>
               <ListItemButton onClick={handleItemClick}>
@@ -171,7 +132,7 @@ export default function Navbar() {
         })}
       </List>
 
-      {history && (
+      {chatSessions && (
         <Button
           fullWidth
           size="large"
@@ -211,7 +172,7 @@ export default function Navbar() {
             open={settingsDialogVisible}
             onClose={hideSettingsHandler}
             currentKey={apiKeyValue || ""}
-            currentAiEnginesModel={aiEnginesModelValue}
+            currentAiEnginesModel={aiEngines}
           />
         )}
         <div className={styles.box}>
@@ -237,7 +198,7 @@ export default function Navbar() {
                 <TextField
                   id="select-ai-engine"
                   value={engineModelToString(
-                    getEngineModelForPage(aiEnginesModelValue, currentPage)
+                    getEngineModelForPage(aiEngines, currentPage)
                   )}
                   label={modelLabel}
                   className={styles.combo}

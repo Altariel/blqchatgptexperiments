@@ -2,15 +2,18 @@ import Button from '@mui/material/Button';
 import React, { useContext, useEffect } from 'react';
 
 import ChatMessage from '@/components/chatmessage';
-import { AIEnginesValueContext } from '@/lib/aiengine-value-provider';
+import { AIEnginesContext } from '@/lib/aiengine-provider';
+import { ApiKeyContext } from '@/lib/api-key-provider';
+import { ChatSessionsContext } from '@/lib/chat-sessions-provider';
+import { chat, isOpenApiError } from '@/lib/openai-utils';
 import { CustomRole, Message, OpenAIRole, getChatSessionId } from '@/types/chattypes';
 import SendIcon from '@mui/icons-material/Send';
 import { Box, Grid } from '@mui/material';
 import TextField from '@mui/material/TextField';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { ApiKeyValueContext } from '@/lib/apikey-value-provider';
-import { DataStorageContext } from '@/lib/data-storage-provider';
-import { chat, isOpenApiError } from '@/lib/openai-utils';
+
+import thinkingGif from '@/public/thinking.gif';
 
 export default function Chat() {
   const [messages, setMessages] = React.useState<Message[]>([
@@ -28,17 +31,17 @@ export default function Chat() {
     }
   ]);
   const [input, setInput] = React.useState("");
-
+  const [showBubble, setShowBubble] = React.useState(false);
   const router = useRouter();
-  const apiKey = useContext(ApiKeyValueContext);
-  const dataStorageContext = useContext(DataStorageContext);
-  const aiEngineModel = useContext(AIEnginesValueContext);
+  const apiKey = useContext(ApiKeyContext).apiKey;
+  const { storage, chatSessions } = useContext(ChatSessionsContext);
+  const { aiEnginesStorage: aiEngineStorage, aiEngines: aiEngine } = useContext(AIEnginesContext);
 
   useEffect(() => {
     async function fetchData() {
       const data = router.query;
       if (data.id) {
-        const oldMessages = await dataStorageContext.get(data.id as string);
+        const oldMessages = await storage.get(data.id as string);
         if (oldMessages) {
           setMessages(oldMessages.messages);
         }
@@ -46,31 +49,34 @@ export default function Chat() {
     }
 
     fetchData();
-  }, [router.query, dataStorageContext]);
+  }, [router.query, storage]);
 
   // TODO: set che chat model
 
   async function handleSendToAI() {
+
     const message = input.trim();
     if (message === "") {
       return;
     }
     setInput("");
+    setShowBubble(true)
 
     const newMessages = messages.concat([{ id: messages.length + 1, content: message, role: OpenAIRole.User, timestamp: Date.now() }]);
-
+    setMessages(newMessages);
     if (!apiKey) {
       newMessages.push({ id: newMessages.length + 1, content: "API Key not set", role: CustomRole.Application, timestamp: Date.now() });
       setMessages(newMessages);
       return;
     }
-    
-    const response = await chat(apiKey, aiEngineModel, newMessages);
+    const response = await chat(apiKey, aiEngine, newMessages);
+
+    setShowBubble(false);
     if (!isOpenApiError(response)) {
       newMessages.push({ id: newMessages.length + 1, content: response, role: OpenAIRole.Assistant, timestamp: Date.now() });
       setMessages(newMessages);
 
-      dataStorageContext.set({
+      storage.set({
         id: getChatSessionId(newMessages),
         messages: newMessages
       });
@@ -98,16 +104,19 @@ export default function Chat() {
       sx={{
         display: "flex",
         flexDirection: "column",
-        backgroundColor: "red",
+        backgroundColor: "#F8F8F8",
+        // flex: "1 1 auto",
         height: "100%"
       }}
     >
       <Box
-        sx={{ flexGrow: 1, overflow: "auto", p: 2, backgroundColor: "blue" }}
+        sx={{ flexGrow: 1, overflow: "auto", p: 2 }}
       >
         {messagesToDisplay.map((message) => (
           <ChatMessage key={message.id} {...message} />
+          
         ))}
+        {showBubble && <Image src={thinkingGif} alt="thinking" />}
       </Box>
       <Box sx={{ p: 2, backgroundColor: "background.default" }}>
         <Grid container spacing={2}>
@@ -137,23 +146,4 @@ export default function Chat() {
       </Box>
     </Box>
   );
-
-  // return (
-  //   <div className={styles.main}>
-  //     <h1>Chat</h1>
-  //     <div> model: "gpt-3.5-turbo"</div>
-  //     <form>
-  //       <div className={styles.label}>
-  //         <label htmlFor='api-key'>API Key</label>
-  //         <input className={styles.input} id="api-key" ref={inputAPIKeyRef} type="text" />
-  //       </div>
-  //       <div className={styles.label}>
-  //         <label htmlFor='query'>Query</label>
-  //         <input className={styles.input} id="query" ref={queryRef} type="text" defaultValue="Chi e' il presidente degli stati uniti?" />
-  //       </div>
-  //       <div><button onClick={handleSendToAI} >Go</button></div>
-  //       <div>{chatGPTAnswer}</div>
-  //     </form>
-  //   </div>
-  // )
 }

@@ -1,29 +1,27 @@
 'use client';
 
+import { AIEnginesContext } from "@/lib/aiengine-provider";
+import { AIEnginesStorage, AIEnginesType, DefaultEngines } from "@/lib/aiengine-storage";
+import { ApiKeyContext } from "@/lib/api-key-provider";
+import { ApiKeyStorage } from "@/lib/apikey-storage";
+import { ChatSessionsContext } from "@/lib/chat-sessions-provider";
+import { LocalDataStorage } from "@/lib/local-data-storage";
 import "@/styles/globals.css";
-import 'typeface-roboto'
+import { ChatSession } from "@/types/chattypes";
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
+import { ThemeProvider } from "@mui/material";
 import type { AppProps } from "next/app";
 import Head from "next/head";
 import { Fragment, useEffect, useMemo, useState } from "react";
-import Layout from '../components/layout'
-import { DataStorageContext } from "@/lib/data-storage-provider";
-import { LocalDataStorage } from "@/lib/local-data-storage";
-import { ApiKeyStorageContext } from "@/lib/apikey-storage-provider";
-import { ApiKeyStorage } from "@/lib/apikey-storage";
-import React from "react";
-import { ApiKeyValueContext } from "@/lib/apikey-value-provider";
-import { ChatSession } from "@/types/chattypes";
-import { ChatSessionsValueContext } from "@/lib/chat-sessions-value-provider";
-import { AIEnginesStorage, AIChatEngineModel, AIEnginesType, DefaultEngines } from "@/lib/aiengine-storage";
-import { AIEnginesValueContext } from "@/lib/aiengine-value-provider";
-import { AIEngineStorageContext } from "@/lib/aiengine-storage-provider";
+import 'typeface-roboto';
+import Layout from '../components/layout';
+import theme from "./theme";
 
 export default function App({ Component, pageProps }: AppProps) {
-    
+
   const [apiKey, setApiKey] = useState<string | null>(null);
   const [aiEngines, setAiEngines] = useState<AIEnginesType>(DefaultEngines);
   const [chatSessions, setChatSessions] = useState([] as ChatSession[]);
@@ -47,8 +45,8 @@ export default function App({ Component, pageProps }: AppProps) {
     storage.addObserver((newKey) => setApiKey(newKey));
     return storage;
   }, []);
-  
-  const aiEngineStorage = useMemo(() => {
+
+  const aiEnginesStorage = useMemo(() => {
     const storage = new AIEnginesStorage();
     storage.addObserver((newAiEngines) => {
       setAiEngines(newAiEngines);
@@ -58,8 +56,8 @@ export default function App({ Component, pageProps }: AppProps) {
 
   useEffect(() => {
     setApiKey(apiKeyStorage.getAPIKey());
-    setAiEngines(aiEngineStorage.getAIEngines());
-  }, [apiKeyStorage, aiEngineStorage]);
+    setAiEngines(aiEnginesStorage.getAIEngines());
+  }, [apiKeyStorage, aiEnginesStorage]);
 
   useEffect(() => {
     async function fetchData() {
@@ -70,8 +68,8 @@ export default function App({ Component, pageProps }: AppProps) {
     fetchData();
   }, [storage]);
 
-  return (
-    <Fragment>
+  return (<Fragment>
+      <ThemeProvider theme={theme}>
       <Head>
         <title>BLQ Chat</title>
         <meta
@@ -81,21 +79,16 @@ export default function App({ Component, pageProps }: AppProps) {
         <meta name="viewport" content="initial-scale=1, width=device-width" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <AIEnginesValueContext.Provider value={aiEngines}>
-        <AIEngineStorageContext.Provider value={aiEngineStorage}>
-          <ApiKeyValueContext.Provider value={apiKey}>
-            <ApiKeyStorageContext.Provider value={apiKeyStorage}>
-              <DataStorageContext.Provider value={storage}>
-                <ChatSessionsValueContext.Provider value={chatSessions}>
-                <Layout>
-                  <Component {...pageProps} />
-                </Layout>
-                </ChatSessionsValueContext.Provider>
-              </DataStorageContext.Provider>
-            </ApiKeyStorageContext.Provider>
-          </ApiKeyValueContext.Provider>
-        </AIEngineStorageContext.Provider>
-      </AIEnginesValueContext.Provider>
+      <AIEnginesContext.Provider value={{ aiEnginesStorage: aiEnginesStorage, aiEngines }}>
+        <ApiKeyContext.Provider value={{ apiKeyStorage, apiKey }}>
+          <ChatSessionsContext.Provider value={{ storage, chatSessions }}>
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+          </ChatSessionsContext.Provider>
+        </ApiKeyContext.Provider>
+      </AIEnginesContext.Provider>
+    </ThemeProvider>
     </Fragment>
   );
 }
