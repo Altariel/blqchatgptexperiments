@@ -18,14 +18,14 @@ import React from "react";
 import { ApiKeyValueContext } from "@/lib/apikey-value-provider";
 import { ChatSession } from "@/types/chattypes";
 import { ChatSessionsValueContext } from "@/lib/chat-sessions-value-provider";
-import { AIEngineStorage, AIEngineModel } from "@/lib/aiengine-storage";
-import { AIEngineValueContext } from "@/lib/aiengine-value-provider";
+import { AIEnginesStorage, AIChatEngineModel, AIEnginesType, DefaultEngines } from "@/lib/aiengine-storage";
+import { AIEnginesValueContext } from "@/lib/aiengine-value-provider";
 import { AIEngineStorageContext } from "@/lib/aiengine-storage-provider";
 
 export default function App({ Component, pageProps }: AppProps) {
     
   const [apiKey, setApiKey] = useState<string | null>(null);
-  const [aiEngine, setAiEngine] = useState<AIEngineModel>(AIEngineModel.Gpt3_5);
+  const [aiEngines, setAiEngines] = useState<AIEnginesType>(DefaultEngines);
   const [chatSessions, setChatSessions] = useState([] as ChatSession[]);
 
   const storage = useMemo(() => {
@@ -49,16 +49,16 @@ export default function App({ Component, pageProps }: AppProps) {
   }, []);
   
   const aiEngineStorage = useMemo(() => {
-    const storage = new AIEngineStorage();
-    storage.addObserver((newAiEngine) => {
-      setAiEngine(newAiEngine);
+    const storage = new AIEnginesStorage();
+    storage.addObserver((newAiEngines) => {
+      setAiEngines(newAiEngines);
     });
     return storage;
   }, []);
 
   useEffect(() => {
     setApiKey(apiKeyStorage.getAPIKey());
-    setAiEngine(aiEngineStorage.getAIEngine());
+    setAiEngines(aiEngineStorage.getAIEngines());
   }, [apiKeyStorage, aiEngineStorage]);
 
   useEffect(() => {
@@ -81,7 +81,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <meta name="viewport" content="initial-scale=1, width=device-width" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <AIEngineValueContext.Provider value={aiEngine}>
+      <AIEnginesValueContext.Provider value={aiEngines}>
         <AIEngineStorageContext.Provider value={aiEngineStorage}>
           <ApiKeyValueContext.Provider value={apiKey}>
             <ApiKeyStorageContext.Provider value={apiKeyStorage}>
@@ -95,7 +95,7 @@ export default function App({ Component, pageProps }: AppProps) {
             </ApiKeyStorageContext.Provider>
           </ApiKeyValueContext.Provider>
         </AIEngineStorageContext.Provider>
-      </AIEngineValueContext.Provider>
+      </AIEnginesValueContext.Provider>
     </Fragment>
   );
 }

@@ -2,7 +2,7 @@ import Button from '@mui/material/Button';
 import React, { useContext, useEffect } from 'react';
 
 import ChatMessage from '@/components/chatmessage';
-import { AIEngineValueContext } from '@/lib/aiengine-value-provider';
+import { AIEnginesValueContext } from '@/lib/aiengine-value-provider';
 import { CustomRole, Message, OpenAIRole, getChatSessionId } from '@/types/chattypes';
 import SendIcon from '@mui/icons-material/Send';
 import { Box, Grid } from '@mui/material';
@@ -32,7 +32,7 @@ export default function Chat() {
   const router = useRouter();
   const apiKey = useContext(ApiKeyValueContext);
   const dataStorageContext = useContext(DataStorageContext);
-  const aiEngineModel = useContext(AIEngineValueContext);
+  const aiEngineModel = useContext(AIEnginesValueContext);
 
   useEffect(() => {
     async function fetchData() {

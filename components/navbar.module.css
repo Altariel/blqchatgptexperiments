@@ -39,6 +39,12 @@
     display: flex;
     justify-content: center;
   }
+
+  .box_first_last {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+  }
   
 .box:first-child > span { margin-right: auto; }
 

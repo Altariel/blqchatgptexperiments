@@ -1,4 +1,4 @@
 import { createContext } from 'react';
-import { AIEngineModel } from './aiengine-storage';
+import { AIEnginesType, DefaultEngines } from './aiengine-storage';
 
-export const AIEngineValueContext = createContext<AIEngineModel>(AIEngineModel.Gpt3_5);
+export const AIEnginesValueContext = createContext<AIEnginesType>(DefaultEngines);

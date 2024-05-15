@@ -1,6 +1,6 @@
-import { AIEngineModel } from "@/lib/aiengine-storage";
+import { AIChatEngineModel, AIEnginesType } from "@/lib/aiengine-storage";
 import { AIEngineStorageContext } from "@/lib/aiengine-storage-provider";
-import { AIEngineValueContext } from "@/lib/aiengine-value-provider";
+import { AIEnginesValueContext } from "@/lib/aiengine-value-provider";
 import { ApiKeyStorageContext } from "@/lib/apikey-storage-provider";
 import { ApiKeyValueContext } from "@/lib/apikey-value-provider";
 import { ChatSessionsValueContext } from "@/lib/chat-sessions-value-provider";
@@ -14,7 +14,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useContext, useEffect } from "react";
 import styles from "./navbar.module.css";
-import { ApiKeyDialog } from "./settingsdialog";
+import { ApiKeyDialog, CurrentPage, getEngineModelForPage, modelToString as engineModelToString, pageToModelLabel } from "./settingsdialog";
 
 // why this is not working?
 import { ThemeProvider } from "@mui/material";
@@ -90,17 +90,17 @@ const theme = createTheme({
 // });
 
 export default function Navbar() {
-  const [settingsDialogVisible, setSettingsDialogVisible] = React.useState(false);
+  const [settingsDialogVisible, setSettingsDialogVisible] =
+    React.useState(false);
   const apiKeyValue = useContext(ApiKeyValueContext);
-  const aiEngineModelValue = useContext(AIEngineValueContext);
+  const aiEnginesModelValue = useContext(AIEnginesValueContext);
   const [openDrawer, setOpenDrawer] = React.useState(false);
-  const [aiEngine, setAiEngine] = React.useState<AIEngineModel>(aiEngineModelValue);
+  // const [aiEngines, setAiEngines] = React.useState<AIEnginesType>(aiEnginesModelValue);
 
-  
   const dataStorageContext = useContext(DataStorageContext);
   const history = useContext(ChatSessionsValueContext);
-  const apiKeyStorageContext = useContext(ApiKeyStorageContext);  
-  const aiEngineStorageContext = useContext(AIEngineStorageContext);  
+  const apiKeyStorageContext = useContext(ApiKeyStorageContext);
+  const aiEngineStorageContext = useContext(AIEngineStorageContext);
 
   const router = useRouter();
 
@@ -112,16 +112,16 @@ export default function Navbar() {
     router.push("/");
   }
 
-  useEffect(() => {
-    aiEngineStorageContext.setAIEngine(aiEngine);    
-  }, [aiEngine]);
+  // useEffect(() => {
+  //   aiEngineStorageContext.setAIEngines(aiEngines);
+  // }, [aiEngines]);
 
-  function hideSettingsHandler(newKey: string, newAiEngine: AIEngineModel) {
+  function hideSettingsHandler(newKey: string, newAiEngines: AIEnginesType) {
     setSettingsDialogVisible(false);
     apiKeyStorageContext.setAPIKey(newKey);
 
     //
-    aiEngineStorageContext.setAIEngine(newAiEngine);
+    aiEngineStorageContext.setAIEngines(newAiEngines);
   }
 
   function getPageName() {
@@ -139,11 +139,11 @@ export default function Navbar() {
 
   const handleItemClick = (e: any) => {
     console.log(e.target.textContent);
-  }
+  };
 
   const clearHistoryHandler = () => {
     void dataStorageContext.clear();
-  }
+  };
 
   const DrawerList = (
     <Box
@@ -160,7 +160,7 @@ export default function Navbar() {
                 <Link
                   href={{
                     pathname: "/chat",
-                    query: {id: chatSession.id}, // the data
+                    query: { id: chatSession.id }, // the data
                   }}
                 >
                   {chatSession.id}
@@ -185,8 +185,25 @@ export default function Navbar() {
     </Box>
   );
 
+  let currentPage;
+  switch (router.pathname.split("/")[1]) {
+    case "chat":
+      currentPage = CurrentPage.Chat;
+      break;
+    case "audio":
+      currentPage = CurrentPage.Transcribe;
+      break;
+    case "generate":
+      currentPage = CurrentPage.Image;
+      break;
+    default:
+      currentPage = CurrentPage.Home;
+      break;
+  }
+
+  const modelLabel = pageToModelLabel(currentPage);
+
   return (
-    <ThemeProvider theme={theme}>
     <div className={styles.mainDiv}>
       <div className={styles.navbar}>
         {settingsDialogVisible && (
@@ -194,7 +211,7 @@ export default function Navbar() {
             open={settingsDialogVisible}
             onClose={hideSettingsHandler}
             currentKey={apiKeyValue || ""}
-            currentAiEngineModel={aiEngineModelValue}
+            currentAiEnginesModel={aiEnginesModelValue}
           />
         )}
         <div className={styles.box}>
@@ -213,19 +230,20 @@ export default function Navbar() {
             <h1>AI Aiutami tu {getPageName()}</h1>
           </span>
         </div>
-        <div className={styles.box}>
-          <span className={styles.rightIcons}>          
-            <TextField
-            id="select-ai-engine"
-            value={aiEngine}
-            label="AI Engine Model"
-            onChange={(e) => setAiEngine(e.target.value as AIEngineModel)}
-            className={styles.combo}
-            select
-          >
-            <MenuItem value={AIEngineModel.Gpt3_5}>GPT 3.5 Turbo</MenuItem>
-            <MenuItem value={AIEngineModel.Gpt4}>GPT 4</MenuItem>
-          </TextField>
+        <div className={styles.box_first_last}>
+          <span className={styles.rightIcons}>
+            {currentPage !== CurrentPage.Home && (
+              <ThemeProvider theme={theme}>
+                <TextField
+                  id="select-ai-engine"
+                  value={engineModelToString(
+                    getEngineModelForPage(aiEnginesModelValue, currentPage)
+                  )}
+                  label={modelLabel}
+                  className={styles.combo}
+                ></TextField>
+              </ThemeProvider>
+            )}
             <SettingsIcon
               onClick={showSettingsHandler}
               className={styles.button}
@@ -237,6 +255,5 @@ export default function Navbar() {
         {DrawerList}
       </Drawer>
     </div>
-    </ThemeProvider>
   );
 }
