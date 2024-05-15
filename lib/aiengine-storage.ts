@@ -1,4 +1,4 @@
-import { IAIEngineStorage as IAIEnginesStorage } from "@/types/iaienginestorage";
+import { IAIEnginesStorage as IAIEnginesStorage } from "@/types/iaienginestorage";
 import { IAPIKeyStorage } from "@/types/iapikeystorage";
 
 const AI_ENGINES_STORAGE = "ai-engines";

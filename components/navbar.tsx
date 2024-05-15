@@ -10,7 +10,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useContext } from "react";
 import styles from "./navbar.module.css";
-import { ApiKeyDialog, CurrentPage, getEngineModelForPage, pageToModelLabel } from "./settingsdialog";
+import { ApiKeyDialog, CurrentPage, getEngineModelForPage, engineModelToString, pageToModelLabel } from "./settingsdialog";
 
 // why this is not working?
 import { ThemeProvider } from "@mui/material";

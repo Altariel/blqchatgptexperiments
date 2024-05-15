@@ -46,7 +46,7 @@ export function getEngineModelForPage(aiEngines: AIEnginesType, currentPage: Cur
   }
 }
 
-export function modelToString(model: AIChatEngineModel | AITranscribeEngineModel | AIImageEngineModel): string {
+export function engineModelToString(model: AIChatEngineModel | AITranscribeEngineModel | AIImageEngineModel): string {
   switch (model) {
     case AIChatEngineModel.Gpt3_5:
       return "GPT 3.5 Turbo";
@@ -144,10 +144,10 @@ export function ApiKeyDialog(props: ApiKeyDialogProps) {
               select
             >
               <MenuItem value={AIChatEngineModel.Gpt3_5}>
-                {modelToString(AIChatEngineModel.Gpt3_5)}
+                {engineModelToString(AIChatEngineModel.Gpt3_5)}
               </MenuItem>
               <MenuItem value={AIChatEngineModel.Gpt4}>
-                {modelToString(AIChatEngineModel.Gpt4)}
+                {engineModelToString(AIChatEngineModel.Gpt4)}
               </MenuItem>
             </TextField>
             <TextField
@@ -167,7 +167,7 @@ export function ApiKeyDialog(props: ApiKeyDialogProps) {
               select
             >
               <MenuItem value={AITranscribeEngineModel.Whisper_1}>
-                {modelToString(AITranscribeEngineModel.Whisper_1)}
+                {engineModelToString(AITranscribeEngineModel.Whisper_1)}
               </MenuItem>
             </TextField>
             <TextField
@@ -187,7 +187,7 @@ export function ApiKeyDialog(props: ApiKeyDialogProps) {
               select
             >
               <MenuItem value={AIImageEngineModel.Dall_E_3}>
-                {modelToString(AIImageEngineModel.Dall_E_3)}
+                {engineModelToString(AIImageEngineModel.Dall_E_3)}
               </MenuItem>
             </TextField>
           </div>
