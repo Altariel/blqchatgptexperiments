@@ -25,30 +25,30 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           '& label': {
-            color: 'white',
+            color: 'black',
           },
           '& label.Mui-focused': {
-            color: 'white',
+            color: 'black',
           },
           '& .MuiInput-underline:after': {
             borderBottomColor: 'yellow',
           },
           '& .MuiOutlinedInput-root': {
             '& fieldset': {
-              borderColor: 'white',
+              borderColor: 'black',
             },
             '&:hover fieldset': {
-              borderColor: 'white',
+              borderColor: 'gray',
             },
             '&.Mui-focused fieldset': {
               borderColor: 'red',
             },  
             '& ': {
-              color: 'white', // Change the color here
+              color: 'black', // Change the color here
               width: '150px'
             }, 
             '& .MuiSelect-icon': {
-              color: 'white', // Change the color here
+              color: 'black', // Change the color here
             },                  
           },                         
         },
