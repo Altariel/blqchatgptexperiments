@@ -1,7 +1,7 @@
 'use client';
 
-import { AIEngineContext } from "@/lib/aiengine-provider";
-import { AIEngineModel, AIEngineStorage } from "@/lib/aiengine-storage";
+import { AIEnginesContext } from "@/lib/aiengine-provider";
+import { AIEnginesStorage, AIEnginesType, DefaultEngines } from "@/lib/aiengine-storage";
 import { ApiKeyContext } from "@/lib/api-key-provider";
 import { ApiKeyStorage } from "@/lib/apikey-storage";
 import { ChatSessionsContext } from "@/lib/chat-sessions-provider";
@@ -23,7 +23,7 @@ import theme from "./theme";
 export default function App({ Component, pageProps }: AppProps) {
 
   const [apiKey, setApiKey] = useState<string | null>(null);
-  const [aiEngine, setAiEngine] = useState<AIEngineModel>(AIEngineModel.Gpt3_5);
+  const [aiEngines, setAiEngines] = useState<AIEnginesType>(DefaultEngines);
   const [chatSessions, setChatSessions] = useState([] as ChatSession[]);
 
   const storage = useMemo(() => {
@@ -46,18 +46,18 @@ export default function App({ Component, pageProps }: AppProps) {
     return storage;
   }, []);
 
-  const aiEngineStorage = useMemo(() => {
-    const storage = new AIEngineStorage();
-    storage.addObserver((newAiEngine) => {
-      setAiEngine(newAiEngine);
+  const aiEnginesStorage = useMemo(() => {
+    const storage = new AIEnginesStorage();
+    storage.addObserver((newAiEngines) => {
+      setAiEngines(newAiEngines);
     });
     return storage;
   }, []);
 
   useEffect(() => {
     setApiKey(apiKeyStorage.getAPIKey());
-    setAiEngine(aiEngineStorage.getAIEngine());
-  }, [apiKeyStorage, aiEngineStorage]);
+    setAiEngines(aiEnginesStorage.getAIEngines());
+  }, [apiKeyStorage, aiEnginesStorage]);
 
   useEffect(() => {
     async function fetchData() {
@@ -79,7 +79,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <meta name="viewport" content="initial-scale=1, width=device-width" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <AIEngineContext.Provider value={{ aiEngineStorage, aiEngine }}>
+      <AIEnginesContext.Provider value={{ aiEnginesStorage: aiEnginesStorage, aiEngines }}>
         <ApiKeyContext.Provider value={{ apiKeyStorage, apiKey }}>
           <ChatSessionsContext.Provider value={{ storage, chatSessions }}>
             <Layout>
@@ -87,7 +87,7 @@ export default function App({ Component, pageProps }: AppProps) {
             </Layout>
           </ChatSessionsContext.Provider>
         </ApiKeyContext.Provider>
-      </AIEngineContext.Provider>
+      </AIEnginesContext.Provider>
     </ThemeProvider>
     </Fragment>
   );

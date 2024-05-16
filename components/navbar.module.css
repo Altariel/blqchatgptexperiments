@@ -23,3 +23,38 @@
     width: 250;
     padding: 20px;
 }
+
+.rightIcons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.marginRight {
+    margin-right: 20px;
+}
+
+.box {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+  }
+
+  .box_first_last {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+.box:first-child > span { margin-right: auto; }
+
+.box:last-child  > span { margin-left: auto;  }
+
+.combo {
+    margin-right: 20px;
+    color: white;    
+}
+
+.combo:hover {
+    color: red;
+}

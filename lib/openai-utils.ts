@@ -1,9 +1,6 @@
 import { CustomRole, Message, OpenAIRole } from "@/types/chattypes";
 import { OpenAI } from "openai";
-import { AIEngineModel, getAIEngineModelString } from "./aiengine-storage";
-
-const transcribeModel = "whisper-1";
-const generateModel = "dall-e-3";
+import { AIChatEngineModel, getAIChatEngineModelString } from "./aiengine-storage";
 
 export enum OpenAIApiErrorType {
     InvalidApiKey,
@@ -44,7 +41,7 @@ export async function transcribe(apiKey: string, file: File): Promise<string|Ope
   }
 }
 
-export async function chat(apiKey: string, aiEngineModel: AIEngineModel,  messages: Message[]) : Promise<string|OpenAIApiError> {
+export async function chat(apiKey: string, aiEngineModel: AIChatEngineModel,  messages: Message[]) : Promise<string|OpenAIApiError> {
   const openai = new OpenAI({
     apiKey: apiKey,
     dangerouslyAllowBrowser: true,
@@ -56,11 +53,11 @@ export async function chat(apiKey: string, aiEngineModel: AIEngineModel,  messag
       return { role: message.role as OpenAIRole, content: message.content };
     });
 
-  const aiEngineModelString = getAIEngineModelString(aiEngineModel);
+  const aiChatEngineModelString = getAIChatEngineModelString(aiEngineModel);
 
   try {
     const response = await openai.chat.completions.create({
-      model: aiEngineModelString,
+      model: aiChatEngineModelString,
       messages: query
     });
 

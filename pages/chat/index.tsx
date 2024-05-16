@@ -2,7 +2,7 @@ import Button from '@mui/material/Button';
 import React, { useContext, useEffect } from 'react';
 
 import ChatMessage from '@/components/chatmessage';
-import { AIEngineContext } from '@/lib/aiengine-provider';
+import { AIEnginesContext } from '@/lib/aiengine-provider';
 import { ApiKeyContext } from '@/lib/api-key-provider';
 import { ChatSessionsContext } from '@/lib/chat-sessions-provider';
 import { chat, isOpenApiError } from '@/lib/openai-utils';
@@ -36,7 +36,7 @@ export default function Chat() {
   const router = useRouter();
   const apiKey = useContext(ApiKeyContext).apiKey;
   const { storage, chatSessions } = useContext(ChatSessionsContext);
-  const { aiEngineStorage, aiEngine } = useContext(AIEngineContext);
+  const { aiEnginesStorage: aiEngineStorage, aiEngines: aiEngine } = useContext(AIEnginesContext);
 
   useEffect(() => {
     async function fetchData() {

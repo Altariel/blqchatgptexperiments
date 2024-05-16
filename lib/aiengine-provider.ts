@@ -1,8 +1,8 @@
-import { IAIEngineStorage } from "@/types/iaienginestorage";
-import { AIEngineModel } from "./aiengine-storage";
+import { IAIEnginesStorage } from "@/types/iaienginestorage";
+import { AIEnginesType, DefaultEngines } from "./aiengine-storage";
 import { createContext } from "react";
 
-export const AIEngineContext = createContext<{
-  aiEngineStorage: IAIEngineStorage;
-  aiEngine: AIEngineModel;
-}>({ aiEngineStorage: {} as IAIEngineStorage, aiEngine: AIEngineModel.Gpt3_5 });
+export const AIEnginesContext = createContext<{
+  aiEnginesStorage: IAIEnginesStorage;
+  aiEngines: AIEnginesType;
+}>({ aiEnginesStorage: {} as IAIEnginesStorage, aiEngines: DefaultEngines });

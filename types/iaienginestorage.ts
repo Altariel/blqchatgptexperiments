@@ -1,5 +1,5 @@
-import { AIEngineModel } from "@/lib/aiengine-storage";
+import { AIEnginesType } from "@/lib/aiengine-storage";
 
-export interface IAIEngineStorage {
-    setAIEngine(aiEngine: AIEngineModel): void;
+export interface IAIEnginesStorage {
+    setAIEngines(aiEngines: AIEnginesType): void;
 }
