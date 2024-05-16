@@ -36,3 +36,7 @@
   display: "flex";
   align-content: flex-end;
 }
+
+.myHeight {
+    height: 40px;
+}

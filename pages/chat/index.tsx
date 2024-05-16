@@ -14,6 +14,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 
 import thinkingGif from '@/public/thinking.gif';
+import styles from "./index.module.css";
 
 export default function Chat() {
   const [messages, setMessages] = React.useState<Message[]>([
@@ -106,15 +107,12 @@ export default function Chat() {
         flexDirection: "column",
         backgroundColor: "#F8F8F8",
         // flex: "1 1 auto",
-        height: "100%"
+        height: "100%",
       }}
     >
-      <Box
-        sx={{ flexGrow: 1, overflow: "auto", p: 2 }}
-      >
+      <Box sx={{ flexGrow: 1, overflow: "auto", p: 2 }}>
         {messagesToDisplay.map((message) => (
           <ChatMessage key={message.id} {...message} />
-          
         ))}
         {showBubble && <Image src={thinkingGif} alt="thinking" />}
       </Box>
@@ -122,6 +120,9 @@ export default function Chat() {
         <Grid container spacing={2}>
           <Grid item xs={10}>
             <TextField
+              InputProps={{
+                className: styles.myHeight,
+              }}
               fullWidth
               placeholder="Type a message"
               value={input}
@@ -138,6 +139,7 @@ export default function Chat() {
               endIcon={<SendIcon />}
               onClick={handleSendToAI}
               disabled={!input.trim() || !apiKey}
+              className={styles.myHeight}
             >
               Send
             </Button>
