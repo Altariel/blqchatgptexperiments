@@ -70,7 +70,7 @@ export default function Chat() {
       setMessages(newMessages);
       return;
     }
-    const response = await chat(apiKey, aiEngine, newMessages);
+    const response = await chat(apiKey, aiEngine.chat, newMessages);
 
     setShowBubble(false);
     if (!isOpenApiError(response)) {
