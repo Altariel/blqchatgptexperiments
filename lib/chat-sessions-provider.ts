@@ -3,6 +3,6 @@ import { IDataStorage } from "@/types/idatastorage";
 import { createContext } from "react";
 
 export const ChatSessionsContext = createContext<{
-  storage: IDataStorage;
+  storage: IDataStorage<ChatSession>;
   chatSessions: ChatSession[];
-}>({ storage: {} as IDataStorage, chatSessions: [] });
+}>({ storage: {} as IDataStorage<ChatSession>, chatSessions: [] });

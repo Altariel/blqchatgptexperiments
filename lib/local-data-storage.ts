@@ -1,14 +1,16 @@
-import { ChatSession } from "@/types/chattypes";
 import { IDataStorage } from "@/types/idatastorage";
 
-const HISTORY_STORAGE = "chatgpt-history";
-
-export class LocalDataStorage implements IDataStorage {
+export class LocalDataStorage<T> implements IDataStorage<T> {
   private observers: (() => void)[] = [];
-  allData: Map<string, ChatSession> = new Map();
+  allData: Map<string, T> = new Map();
+  localStorageKey: string;
+
+  constructor(localStorageKey: string) {
+    this.localStorageKey = localStorageKey; 
+  }
 
   async ensureDataIsAvailable() {
-    const data = localStorage.getItem(HISTORY_STORAGE);
+    const data = localStorage.getItem(this.localStorageKey);
     if (data) {
       const data2 = JSON.parse(data);
       if (!data2 || Object.keys(data2).length === 0) {
@@ -34,7 +36,7 @@ export class LocalDataStorage implements IDataStorage {
     this.allData.set(value.id, value);
 
     const obj = Object.fromEntries(this.allData);
-    localStorage.setItem(HISTORY_STORAGE, JSON.stringify(obj));
+    localStorage.setItem(this.localStorageKey, JSON.stringify(obj));
     this.notifyObservers();
   }
 
@@ -43,7 +45,7 @@ export class LocalDataStorage implements IDataStorage {
     this.allData.delete(id);
 
     const obj = Object.fromEntries(this.allData);
-    localStorage.setItem(HISTORY_STORAGE, JSON.stringify(obj));
+    localStorage.setItem(this.localStorageKey, JSON.stringify(obj));
     this.notifyObservers();
   }
 
@@ -51,7 +53,7 @@ export class LocalDataStorage implements IDataStorage {
     this.allData.clear();
 
     const obj = Object.fromEntries(this.allData);
-    localStorage.setItem(HISTORY_STORAGE, JSON.stringify(obj));
+    localStorage.setItem(this.localStorageKey, JSON.stringify(obj));
     this.notifyObservers();
   }
 

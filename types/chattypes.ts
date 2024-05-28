@@ -22,6 +22,12 @@ export type ChatSession = {
     messages: Message[],
 }
 
+export type TranscribeSession = {
+    id: string,
+    filePath: string;
+    trascription: string;
+}
+
 export function getChatSessionId(messages: Message[]): string {
     const message = messages.find( (message) => message.role === OpenAIRole.User);
     return (messages && message?.content) ||  "unknown";

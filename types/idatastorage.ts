@@ -1,9 +1,7 @@
-import { ChatSession } from "./chattypes";
-
-export interface IDataStorage {
-    get(id: string): Promise<ChatSession | undefined>;
-    set(value: ChatSession): Promise<void>;
+export interface IDataStorage<T> {
+    get(id: string): Promise<T | undefined>;
+    set(value: T): Promise<void>;
     remove(id: string): Promise<void>;
     clear(): Promise<void>;
-    getAll(): Promise<ChatSession[]>
+    getAll(): Promise<T[]>;
 }
