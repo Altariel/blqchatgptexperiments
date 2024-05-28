@@ -24,7 +24,6 @@ export type ChatSession = {
 
 export type TranscribeSession = {
     id: string,
-    filePath: string;
     trascription: string;
 }
 

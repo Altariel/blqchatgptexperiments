@@ -18,6 +18,7 @@ import { createTheme } from "@mui/material/styles";
 import { AIEnginesType } from "@/lib/aiengine-storage";
 
 //
+import {NavbarChatSessionList} from "./navbar-chatsession-list";
 
 const theme = createTheme({
   components: {
@@ -112,37 +113,7 @@ export default function Navbar() {
       role="presentation"
       onClick={toggleDrawer(false)}
     >
-      <h2>History</h2>
-      <List>
-        {chatSessions?.map((chatSession, index) => {
-          return (
-            <ListItem key={chatSession.id + "-" + index} disablePadding>
-              <ListItemButton onClick={handleItemClick}>
-                <Link
-                  href={{
-                    pathname: "/chat",
-                    query: { id: chatSession.id }, // the data
-                  }}
-                >
-                  {chatSession.id}
-                </Link>
-              </ListItemButton>
-            </ListItem>
-          );
-        })}
-      </List>
-
-      {chatSessions && (
-        <Button
-          fullWidth
-          size="large"
-          color="primary"
-          variant="contained"
-          onClick={clearHistoryHandler}
-        >
-          Clear History
-        </Button>
-      )}
+      <NavbarChatSessionList/>
     </Box>
   );
 
