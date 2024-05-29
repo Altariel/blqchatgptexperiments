@@ -1,10 +1,10 @@
-import { ChatSessionsContext } from "@/lib/chat-sessions-provider";
+import { TranscribeSessionsContext } from "@/lib/transcribe-sessions-provider";
 import { Button, List, ListItem, ListItemButton } from "@mui/material";
 import Link from "next/link";
 import { useContext } from "react";
 
-export function NavbarChatSessionList() {
-    const { storage, chatSessions } = useContext(ChatSessionsContext);
+export function NavbarTranscriptionSessionList() {
+    const { storage, transcribeSessions } = useContext(TranscribeSessionsContext);
 
     const handleItemClick = (e: any) => {
         console.log(e.target.textContent);
@@ -16,19 +16,19 @@ export function NavbarChatSessionList() {
 
     return (
         <div>
-            <h2>Chat History</h2>
+            <h2>Transcription History</h2>
             <List>
-                {chatSessions.map((chatSession, index) => {
+                {transcribeSessions.map((transcribeSession, index) => {
                     return (
-                        <ListItem key={chatSession.id + "-" + index} disablePadding>
+                        <ListItem key={transcribeSession.id + "-" + index} disablePadding>
                             <ListItemButton onClick={handleItemClick}>
                                 <Link
                                     href={{
-                                        pathname: "/chat",
-                                        query: { id: chatSession.id }, // the data
+                                        pathname: "/audio",
+                                        query: { id: transcribeSession.id }, // the data
                                     }}
                                 >
-                                    {chatSession.id}
+                                    {transcribeSession.id}
                                 </Link>
                             </ListItemButton>
                         </ListItem>
@@ -36,7 +36,7 @@ export function NavbarChatSessionList() {
                 })}
             </List>
 
-            {chatSessions && (
+            {transcribeSessions && (
                 <Button
                     size="large"
                     color="primary"

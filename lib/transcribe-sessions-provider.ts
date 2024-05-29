@@ -1,4 +1,4 @@
-import { ChatSession, TranscribeSession } from "@/types/chattypes";
+import { TranscribeSession } from "@/types/chattypes";
 import { IDataStorage } from "@/types/idatastorage";
 import { createContext } from "react";
 

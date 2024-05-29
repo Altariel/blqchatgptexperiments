@@ -87,6 +87,15 @@ export default function App({ Component, pageProps }: AppProps) {
     fetchData();
   }, [chatStorage]);
 
+  useEffect(() => {
+    async function fetchData() {
+      const transcribeSessions = await transcriptionsStorage.getAll();
+      setTranscribeSessions(transcribeSessions);
+    }
+
+    fetchData();
+  }, [transcriptionsStorage]);
+
   return (<Fragment>
     <ThemeProvider theme={theme}>
       <Head>

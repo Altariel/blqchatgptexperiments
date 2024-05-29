@@ -58,3 +58,7 @@
 .combo:hover {
     color: red;
 }
+
+.divider {
+    margin: 20px;
+}

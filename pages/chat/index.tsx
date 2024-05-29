@@ -61,7 +61,7 @@ export default function Chat() {
       return;
     }
     setInput("");
-    setShowBubble(true)
+    setShowBubble(true);
 
     const newMessages = messages.concat([{ id: messages.length + 1, content: message, role: OpenAIRole.User, timestamp: Date.now() }]);
     setMessages(newMessages);
