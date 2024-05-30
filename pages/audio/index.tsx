@@ -53,14 +53,14 @@ export default function Audio() {
         storage.set({
           id: file.name,
           trascription: response,
+          timestamp: Date.now(),
        });
       }
     };
 
-    if (inputRef.current) {
-      setButtonText(file.name);
-    }
+    setButtonText(file.name);
 
+    
     reader.readAsDataURL(file);
   }
 

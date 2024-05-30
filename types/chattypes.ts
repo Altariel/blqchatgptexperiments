@@ -25,6 +25,7 @@ export type ChatSession = {
 export type TranscribeSession = {
     id: string,
     trascription: string;
+    timestamp: number;    
 }
 
 export function getChatSessionId(messages: Message[]): string {
