@@ -11,7 +11,7 @@ import { useRouter } from "next/router";
 import React, { useContext } from "react";
 import styles from "./navbar.module.css";
 import { ApiKeyDialog, CurrentPage, getEngineModelForPage, engineModelToString, pageToModelLabel } from "./settingsdialog";
-
+import AddCommentIcon from '@mui/icons-material/AddComment';
 // why this is not working?
 import { ThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
@@ -102,8 +102,28 @@ export default function Navbar() {
     console.log(e.target.textContent);
   };
 
+  const handleNewChatClick = () => {
+    router.reload();
+  }
+
   const clearHistoryHandler = () => {
     void storage.clear();
+  }
+
+  let currentPage;
+  switch (router.pathname.split("/")[1]) {
+    case "chat":
+      currentPage = CurrentPage.Chat;
+      break;
+    case "audio":
+      currentPage = CurrentPage.Transcribe;
+      break;
+    case "generate":
+      currentPage = CurrentPage.Image;
+      break;
+    default:
+      currentPage = CurrentPage.Home;
+      break;
   }
 
   const DrawerList = (
@@ -112,6 +132,13 @@ export default function Navbar() {
       role="presentation"
       onClick={toggleDrawer(false)}
     >
+      {currentPage === CurrentPage.Chat && (
+        <>
+          <Button variant="contained" startIcon={<AddCommentIcon />} sx={{mb: 2}} onClick={handleNewChatClick}>
+            New Chat
+          </Button>
+        </>
+      )}
       <h2>History</h2>
       <List>
         {chatSessions?.map((chatSession, index) => {
@@ -146,21 +173,7 @@ export default function Navbar() {
     </Box>
   );
 
-  let currentPage;
-  switch (router.pathname.split("/")[1]) {
-    case "chat":
-      currentPage = CurrentPage.Chat;
-      break;
-    case "audio":
-      currentPage = CurrentPage.Transcribe;
-      break;
-    case "generate":
-      currentPage = CurrentPage.Image;
-      break;
-    default:
-      currentPage = CurrentPage.Home;
-      break;
-  }
+
 
   const modelLabel = pageToModelLabel(currentPage);
 
