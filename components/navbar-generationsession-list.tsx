@@ -1,10 +1,11 @@
+import { GenerateSessionsContext } from "@/lib/generate-sessions-provider";
 import { TranscribeSessionsContext } from "@/lib/transcribe-sessions-provider";
 import { Button, List, ListItem, ListItemButton } from "@mui/material";
 import Link from "next/link";
 import { useContext } from "react";
 
-export function NavbarTranscriptionSessionList() {
-    const { storage, transcribeSessions } = useContext(TranscribeSessionsContext);
+export function NavbarGenerateSessionList() {
+    const { storage, generateSessions } = useContext(GenerateSessionsContext);
 
     const handleItemClick = (e: any) => {
         //TODO
@@ -19,17 +20,17 @@ export function NavbarTranscriptionSessionList() {
         <div>
             <h2>Transcription History</h2>
             <List>
-                {transcribeSessions.map((transcribeSession, index) => {
+                {generateSessions.map((generateSession, index) => {
                     return (
-                        <ListItem key={transcribeSession.id + "-" + index} disablePadding>
+                        <ListItem key={generateSession.id + "-" + index} disablePadding>
                             <ListItemButton onClick={handleItemClick}>
                                 <Link
                                     href={{
-                                        pathname: "/audio",
-                                        query: { id: transcribeSession.id }, // the data
+                                        pathname: "/generate",
+                                        query: { id: generateSession.id }, // the data
                                     }}
                                 >
-                                    {transcribeSession.id}
+                                    {generateSession.id}
                                 </Link>
                             </ListItemButton>
                         </ListItem>
@@ -37,7 +38,7 @@ export function NavbarTranscriptionSessionList() {
                 })}
             </List>
 
-            {transcribeSessions && (
+            {generateSessions && (
                 <Button
                     size="large"
                     color="primary"

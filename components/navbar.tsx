@@ -19,6 +19,7 @@ import { AIEnginesType } from "@/lib/aiengine-storage";
 
 import {NavbarChatSessionList} from "./navbar-chatsession-list";
 import {NavbarTranscriptionSessionList} from "./navbar-transcriptionsession-list";
+import { NavbarGenerateSessionList } from "./navbar-generationsession-list";
 
 const theme = createTheme({
   components: {
@@ -109,6 +110,8 @@ export default function Navbar() {
       <NavbarChatSessionList/>
       <Divider className={styles.divider}/>
       <NavbarTranscriptionSessionList/>
+      <Divider className={styles.divider}/>
+      <NavbarGenerateSessionList/>
     </Box>
   );
 
