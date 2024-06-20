@@ -7,7 +7,7 @@ import { ApiKeyStorage } from "@/lib/apikey-storage";
 import { ChatSessionsContext } from "@/lib/chat-sessions-provider";
 import { LocalDataStorage } from "@/lib/local-data-storage";
 import "@/styles/globals.css";
-import { ChatSession, TranscribeSession } from "@/types/chattypes";
+import { ChatSession, GenerateSession, TranscribeSession } from "@/types/chattypes";
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
@@ -20,9 +20,11 @@ import 'typeface-roboto';
 import Layout from '../components/layout';
 import theme from "./theme";
 import { TranscribeSessionsContext } from "@/lib/transcribe-sessions-provider";
+import { GenerateSessionsContext } from "@/lib/generate-sessions-provider";
 
 const CHAT_HISTORY_STORAGE = "chatgpt-history";
 const TRANSCRIBE_HISTORY_STORAGE = "transcribe-history";
+const GENERATE_HISTORY_STORAGE = "generate-history";
 
 export default function App({ Component, pageProps }: AppProps) {
 
@@ -30,6 +32,7 @@ export default function App({ Component, pageProps }: AppProps) {
   const [aiEngines, setAiEngines] = useState<AIEnginesType>(DefaultEngines);
   const [chatSessions, setChatSessions] = useState([] as ChatSession[]);
   const [transcribeSessions, setTranscribeSessions] = useState([] as TranscribeSession[]);
+  const [generateSessions, setGenerateSessions] = useState([] as GenerateSession[]);
 
   const chatStorage = useMemo(() => {
     const dataStorage = new LocalDataStorage<ChatSession>(CHAT_HISTORY_STORAGE);
@@ -48,12 +51,26 @@ export default function App({ Component, pageProps }: AppProps) {
   const transcriptionsStorage = useMemo(() => {
     const dataStorage = new LocalDataStorage<TranscribeSession>(TRANSCRIBE_HISTORY_STORAGE);
     dataStorage.addObserver(() => {
-      async function updateMessages() {
+      async function updateTranscriptions() {
         const transcribeSessions = await dataStorage.getAll();
         setTranscribeSessions(transcribeSessions);
       }
 
-      updateMessages();
+      updateTranscriptions();
+    });
+
+    return dataStorage;
+  }, []);
+
+  const generateSessionsStorage = useMemo(() => {
+    const dataStorage = new LocalDataStorage<GenerateSession>(GENERATE_HISTORY_STORAGE);
+    dataStorage.addObserver(() => {
+      async function updateGeneratedImages() {
+        const geneateSessions = await dataStorage.getAll();
+        setGenerateSessions(geneateSessions);
+      }
+
+      updateGeneratedImages();
     });
 
     return dataStorage;
@@ -111,9 +128,11 @@ export default function App({ Component, pageProps }: AppProps) {
         <ApiKeyContext.Provider value={{ apiKeyStorage, apiKey }}>
           <ChatSessionsContext.Provider value={{ storage: chatStorage, chatSessions }}>
             <TranscribeSessionsContext.Provider value={{ storage: transcriptionsStorage, transcribeSessions }}>
-            <Layout>
-              <Component {...pageProps} />
-            </Layout>
+              <GenerateSessionsContext.Provider value={{ storage: generateSessionsStorage, generateSessions }}>
+                <Layout>
+                  <Component {...pageProps} />
+                </Layout>
+              </GenerateSessionsContext.Provider>
             </TranscribeSessionsContext.Provider>
           </ChatSessionsContext.Provider>
         </ApiKeyContext.Provider>

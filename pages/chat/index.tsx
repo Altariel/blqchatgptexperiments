@@ -14,7 +14,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 
 import thinkingGif from '@/public/thinking.gif';
-import styles from "./index.module.css";
+import classes from "./index.module.css";
 
 export default function Chat() {
   const [messages, setMessages] = React.useState<Message[]>([
@@ -121,7 +121,7 @@ export default function Chat() {
           <Grid item xs={10}>
             <TextField
               InputProps={{
-                className: styles.myHeight,
+                className: classes.myHeight,
               }}
               fullWidth
               placeholder="Type a message"
@@ -139,7 +139,7 @@ export default function Chat() {
               endIcon={<SendIcon />}
               onClick={handleSendToAI}
               disabled={!input.trim() || !apiKey}
-              className={styles.myHeight}
+              className={classes.myHeight}
             >
               Send
             </Button>
