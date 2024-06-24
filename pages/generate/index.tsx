@@ -63,7 +63,7 @@ export default function Generate() {
     return <div className={classes.container}>
         <h1>Generate</h1>
         <textarea className={classes.textarea} ref={textarea} placeholder="Enter the image description here" autoFocus={true} rows={5} wrap="soft" />
-        <button className={classes.button} onClick={generateHandler}>Generate</button>
+        <button className={classes.button} onClick={generateHandler}>Generate Image</button>
         {errorMessage && <div className={classes.error} >{errorMessage}</div>}
         {showBubble && <Image src={thinkingGif} alt="thinking" />}
         <div className={classes.image}>{generatedImage.length > 0 ? <img src={generatedImage} alt="Generated image" width={1024} height={1024} /> : ""}</div>

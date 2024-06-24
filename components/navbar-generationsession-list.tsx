@@ -18,7 +18,7 @@ export function NavbarGenerateSessionList() {
 
     return (
         <div>
-            <h2>Transcription History</h2>
+            <h2>Image Generation History</h2>
             <List>
                 {generateSessions.map((generateSession, index) => {
                     return (

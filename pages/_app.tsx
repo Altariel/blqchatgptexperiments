@@ -112,6 +112,15 @@ export default function App({ Component, pageProps }: AppProps) {
 
     fetchData();
   }, [transcriptionsStorage]);
+  
+  useEffect(() => {
+    async function fetchData() {
+      const generateImageSessions = await generateSessionsStorage.getAll();
+      setGenerateSessions(generateImageSessions);
+    }
+
+    fetchData();
+  }, [generateSessionsStorage]);
 
   return (<Fragment>
     <ThemeProvider theme={theme}>
