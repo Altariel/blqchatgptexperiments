@@ -1,107 +1,53 @@
+import { GenerateSession } from "@/types/chattypes";
 import { IDataStorage } from "@/types/idatastorage";
+import Dexie, { EntityTable } from 'dexie';
 
-export class LocalIndexedDbDataStorage<T> implements IDataStorage<T> {
+type DexieDb = Dexie & { generateHistoryStore: EntityTable<GenerateSession> };
+
+export class LocalIndexedDbDataStorage implements IDataStorage<GenerateSession> {
+
   private observers: (() => void)[] = [];
-  allData: Map<string, T> = new Map();
 
-  private objectStoreName: string = "messages";
-  private myDbName: string = "myIndexedDB";
+  private objectStoreName: string = "generateHistoryStore";
+  private myDbName: string = "generate-history";
 
-  constructor(dbName:string, objectStoreName:string) {
-    this.myDbName = dbName;
-    this.objectStoreName = objectStoreName;
-    // this.init();
+  private openDB(): DexieDb {
+    const db = new Dexie(this.myDbName) as DexieDb;
+    
+    // Schema declaration:
+    db.version(1).stores({
+      [this.objectStoreName]: 'id'
+    });
+
+    return db;
   }
 
-  private openDB(): Promise<IDBDatabase> {
-    return new Promise((resolve, reject) => {
-      const request = indexedDB.open(this.myDbName, 1);
-      request.onupgradeneeded = (event) => {
-        const db = (event.target as IDBOpenDBRequest).result;
-        db.createObjectStore(this.objectStoreName, { keyPath: "id" });
-      };
-
-      request.onsuccess = (event) => {
-        const db = (event.target as IDBOpenDBRequest).result;
-        resolve(db);
-      };
-    });
+  public async get(id: string): Promise<GenerateSession | undefined> {
+    const db = this.openDB();
+    return db.generateHistoryStore.get({id});
   }
 
-  public async get(id: string): Promise<T | undefined> {
-    const objectStoreName = this.objectStoreName;
-    const db = await this.openDB();
-    return new Promise(function (resolve, reject) {
-      const transaction = db.transaction(objectStoreName, "readonly");
-      const objectStore = transaction.objectStore(objectStoreName);
-      const request = objectStore.get(id);
-      request.onsuccess = () => {
-        db.close();
-        return resolve(request.result);
-      };
-    });
-  }
-
-  public async set(message: T): Promise<void> {
-    const objectStoreName = this.objectStoreName;
-    const db = await this.openDB();
-    const notifyObservers = this.notifyObservers.bind(this);
-    return new Promise(function (resolve, reject) {
-      const transaction = db.transaction(objectStoreName, "readwrite");
-      const objectStore = transaction.objectStore(objectStoreName);
-      objectStore.add(message);
-      transaction.oncomplete = () => {
-        db.close();
-        notifyObservers();
-        return resolve();
-      };
-    });
+  public async set(message: GenerateSession): Promise<void> {
+    const db = this.openDB();
+    await db.generateHistoryStore.put(message);
+    this.notifyObservers();
   }
 
   public async remove(id: string): Promise<void> {
-    const objectStoreName = this.objectStoreName;
-    const db = await this.openDB();
-    const notifyObservers = this.notifyObservers.bind(this);
-    return new Promise(function (resolve, reject) {
-      const transaction = db.transaction(objectStoreName, "readwrite");
-      const objectStore = transaction.objectStore(objectStoreName);
-      objectStore.delete(id);
-      transaction.oncomplete = () => {
-        db.close();
-        notifyObservers();
-        return resolve();
-      };
-    });
+    const db = this.openDB();
+    await db.generateHistoryStore.where('id').equals(id).delete();
+    this.notifyObservers();
   }
 
   public async clear(): Promise<void> {
-    const objectStoreName = this.objectStoreName;
-    const db = await this.openDB();
-    const notifyObservers = this.notifyObservers.bind(this);
-    return new Promise(function (resolve, reject) {
-      const transaction = db.transaction(objectStoreName, "readwrite");
-      const objectStore = transaction.objectStore(objectStoreName);
-      objectStore.clear();
-      transaction.oncomplete = () => {
-        db.close();
-        notifyObservers();
-        return resolve();
-      };
-    });
+    const db = this.openDB();
+    await db.generateHistoryStore.clear();
+    this.notifyObservers();
   }
 
-  public async getAll(): Promise<T[]> {
-    const objectStoreName = this.objectStoreName;
-    const db = await this.openDB();
-    return new Promise(function (resolve, reject) {
-      const transaction = db.transaction(objectStoreName, "readonly");
-      const objectStore = transaction.objectStore(objectStoreName);
-      const request2 = objectStore.getAll();
-      request2.onsuccess = () => {
-        db.close();
-        return resolve(request2.result);
-      };
-    });
+  public async getAll(): Promise<GenerateSession[]> {
+    const db = this.openDB();
+    return await db.generateHistoryStore.toArray();
   }
 
   addObserver(callback: () => void) {
