@@ -21,10 +21,12 @@ import Layout from '../components/layout';
 import theme from "./theme";
 import { TranscribeSessionsContext } from "@/lib/transcribe-sessions-provider";
 import { GenerateSessionsContext } from "@/lib/generate-sessions-provider";
+import { LocalIndexedDbDataStorage } from "@/lib/local-indexeddb-data-storage";
 
 const CHAT_HISTORY_STORAGE = "chatgpt-history";
 const TRANSCRIBE_HISTORY_STORAGE = "transcribe-history";
 const GENERATE_HISTORY_STORAGE = "generate-history";
+const GENERATE_HISTORY_STORAGE_STORE = "generate-history-store";
 
 export default function App({ Component, pageProps }: AppProps) {
 
@@ -63,7 +65,7 @@ export default function App({ Component, pageProps }: AppProps) {
   }, []);
 
   const generateSessionsStorage = useMemo(() => {
-    const dataStorage = new LocalDataStorage<GenerateSession>(GENERATE_HISTORY_STORAGE);
+    const dataStorage = new LocalIndexedDbDataStorage<GenerateSession>(GENERATE_HISTORY_STORAGE, GENERATE_HISTORY_STORAGE_STORE);
     dataStorage.addObserver(() => {
       async function updateGeneratedImages() {
         const geneateSessions = await dataStorage.getAll();
