@@ -7,7 +7,7 @@ import { ApiKeyStorage } from "@/lib/apikey-storage";
 import { ChatSessionsContext } from "@/lib/chat-sessions-provider";
 import { LocalDataStorage } from "@/lib/local-data-storage";
 import "@/styles/globals.css";
-import { ChatSession } from "@/types/chattypes";
+import { ChatSession, GenerateSession, TranscribeSession } from "@/types/chattypes";
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
@@ -19,15 +19,23 @@ import { Fragment, useEffect, useMemo, useState } from "react";
 import 'typeface-roboto';
 import Layout from '../components/layout';
 import theme from "./theme";
+import { TranscribeSessionsContext } from "@/lib/transcribe-sessions-provider";
+import { GenerateSessionsContext } from "@/lib/generate-sessions-provider";
+import { LocalIndexedDbDataStorage } from "@/lib/local-indexeddb-data-storage";
+
+const CHAT_HISTORY_STORAGE = "chatgpt-history";
+const TRANSCRIBE_HISTORY_STORAGE = "transcribe-history";
 
 export default function App({ Component, pageProps }: AppProps) {
 
   const [apiKey, setApiKey] = useState<string | null>(null);
   const [aiEngines, setAiEngines] = useState<AIEnginesType>(DefaultEngines);
   const [chatSessions, setChatSessions] = useState([] as ChatSession[]);
+  const [transcribeSessions, setTranscribeSessions] = useState([] as TranscribeSession[]);
+  const [generateSessions, setGenerateSessions] = useState([] as GenerateSession[]);
 
-  const storage = useMemo(() => {
-    const dataStorage = new LocalDataStorage();
+  const chatStorage = useMemo(() => {
+    const dataStorage = new LocalDataStorage<ChatSession>(CHAT_HISTORY_STORAGE);
     dataStorage.addObserver(() => {
       async function updateMessages() {
         const chatSessions = await dataStorage.getAll();
@@ -40,18 +48,46 @@ export default function App({ Component, pageProps }: AppProps) {
     return dataStorage;
   }, []);
 
+  const transcriptionsStorage = useMemo(() => {
+    const dataStorage = new LocalDataStorage<TranscribeSession>(TRANSCRIBE_HISTORY_STORAGE);
+    dataStorage.addObserver(() => {
+      async function updateTranscriptions() {
+        const transcribeSessions = await dataStorage.getAll();
+        setTranscribeSessions(transcribeSessions);
+      }
+
+      updateTranscriptions();
+    });
+
+    return dataStorage;
+  }, []);
+
+  const generateSessionsStorage = useMemo(() => {
+    const dataStorage = new LocalIndexedDbDataStorage();
+    dataStorage.addObserver(() => {
+      async function updateGeneratedImages() {
+        const geneateSessions = await dataStorage.getAll();
+        setGenerateSessions(geneateSessions);
+      }
+
+      updateGeneratedImages();
+    });
+
+    return dataStorage;
+  }, []);
+
   const apiKeyStorage = useMemo(() => {
-    const storage = new ApiKeyStorage();
-    storage.addObserver((newKey) => setApiKey(newKey));
-    return storage;
+    const akstorage = new ApiKeyStorage();
+    akstorage.addObserver((newKey) => setApiKey(newKey));
+    return akstorage;
   }, []);
 
   const aiEnginesStorage = useMemo(() => {
-    const storage = new AIEnginesStorage();
-    storage.addObserver((newAiEngines) => {
+    const aiestorage = new AIEnginesStorage();
+    aiestorage.addObserver((newAiEngines) => {
       setAiEngines(newAiEngines);
     });
-    return storage;
+    return aiestorage;
   }, []);
 
   useEffect(() => {
@@ -61,15 +97,33 @@ export default function App({ Component, pageProps }: AppProps) {
 
   useEffect(() => {
     async function fetchData() {
-      const chatSessions = await storage.getAll();
+      const chatSessions = await chatStorage.getAll();
       setChatSessions(chatSessions);
     }
 
     fetchData();
-  }, [storage]);
+  }, [chatStorage]);
+
+  useEffect(() => {
+    async function fetchData() {
+      const transcribeSessions = await transcriptionsStorage.getAll();
+      setTranscribeSessions(transcribeSessions);
+    }
+
+    fetchData();
+  }, [transcriptionsStorage]);
+  
+  useEffect(() => {
+    async function fetchData() {
+      const generateImageSessions = await generateSessionsStorage.getAll();
+      setGenerateSessions(generateImageSessions);
+    }
+
+    fetchData();
+  }, [generateSessionsStorage]);
 
   return (<Fragment>
-      <ThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
       <Head>
         <title>BLQ Chat</title>
         <meta
@@ -81,14 +135,18 @@ export default function App({ Component, pageProps }: AppProps) {
       </Head>
       <AIEnginesContext.Provider value={{ aiEnginesStorage: aiEnginesStorage, aiEngines }}>
         <ApiKeyContext.Provider value={{ apiKeyStorage, apiKey }}>
-          <ChatSessionsContext.Provider value={{ storage, chatSessions }}>
-            <Layout>
-              <Component {...pageProps} />
-            </Layout>
+          <ChatSessionsContext.Provider value={{ storage: chatStorage, chatSessions }}>
+            <TranscribeSessionsContext.Provider value={{ storage: transcriptionsStorage, transcribeSessions }}>
+              <GenerateSessionsContext.Provider value={{ storage: generateSessionsStorage, generateSessions }}>
+                <Layout>
+                  <Component {...pageProps} />
+                </Layout>
+              </GenerateSessionsContext.Provider>
+            </TranscribeSessionsContext.Provider>
           </ChatSessionsContext.Provider>
         </ApiKeyContext.Provider>
       </AIEnginesContext.Provider>
     </ThemeProvider>
-    </Fragment>
+  </Fragment>
   );
 }

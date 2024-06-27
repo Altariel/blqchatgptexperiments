@@ -11,13 +11,15 @@ import { useRouter } from "next/router";
 import React, { useContext } from "react";
 import styles from "./navbar.module.css";
 import { ApiKeyDialog, CurrentPage, getEngineModelForPage, engineModelToString, pageToModelLabel } from "./settingsdialog";
-
+import Divider from '@mui/material/Divider';
 // why this is not working?
 import { ThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
 import { AIEnginesType } from "@/lib/aiengine-storage";
 
-//
+import {NavbarChatSessionList} from "./navbar-chatsession-list";
+import {NavbarTranscriptionSessionList} from "./navbar-transcriptionsession-list";
+import { NavbarGenerateSessionList } from "./navbar-generationsession-list";
 
 const theme = createTheme({
   components: {
@@ -56,6 +58,7 @@ const theme = createTheme({
     },
   },
 });
+
 export default function Navbar() {
   const [settingsDialogVisible, setSettingsDialogVisible] = React.useState(false);
   const [openDrawer, setOpenDrawer] = React.useState(false);
@@ -98,51 +101,17 @@ export default function Navbar() {
     setOpenDrawer(newOpen);
   };
 
-  const handleItemClick = (e: any) => {
-    console.log(e.target.textContent);
-  };
-
-  const clearHistoryHandler = () => {
-    void storage.clear();
-  }
-
   const DrawerList = (
     <Box
       className={classNames(styles.mainDiv, styles.drawer)}
       role="presentation"
       onClick={toggleDrawer(false)}
     >
-      <h2>History</h2>
-      <List>
-        {chatSessions?.map((chatSession, index) => {
-          return (
-            <ListItem key={chatSession.id + "-" + index} disablePadding>
-              <ListItemButton onClick={handleItemClick}>
-                <Link
-                  href={{
-                    pathname: "/chat",
-                    query: { id: chatSession.id }, // the data
-                  }}
-                >
-                  {chatSession.id}
-                </Link>
-              </ListItemButton>
-            </ListItem>
-          );
-        })}
-      </List>
-
-      {chatSessions && (
-        <Button
-          fullWidth
-          size="large"
-          color="primary"
-          variant="contained"
-          onClick={clearHistoryHandler}
-        >
-          Clear History
-        </Button>
-      )}
+      <NavbarChatSessionList/>
+      <Divider className={styles.divider}/>
+      <NavbarTranscriptionSessionList/>
+      <Divider className={styles.divider}/>
+      <NavbarGenerateSessionList/>
     </Box>
   );
 

@@ -1,6 +1,6 @@
 import { CustomRole, Message, OpenAIRole } from "@/types/chattypes";
 import { OpenAI } from "openai";
-import { AIChatEngineModel, getAIChatEngineModelString } from "./aiengine-storage";
+import { AIChatEngineModel, AIImageEngineModel, AITranscribeEngineModel, getAIChatEngineModelString, getAIImageEngineModel, getAITranscribeEngineModel } from "./aiengine-storage";
 
 export enum OpenAIApiErrorType {
     InvalidApiKey,
@@ -17,7 +17,7 @@ export function isOpenApiError(error: any): error is OpenAIApiError {
     return error.type !== undefined && error.message !== undefined;
 }
 
-export async function transcribe(apiKey: string, file: File): Promise<string|OpenAIApiError> {
+export async function transcribe(apiKey: string, file: File, aiEngineModel: AITranscribeEngineModel): Promise<string|OpenAIApiError> {
   const openai = new OpenAI({
     apiKey: apiKey,
     dangerouslyAllowBrowser: true,
@@ -27,7 +27,7 @@ export async function transcribe(apiKey: string, file: File): Promise<string|Ope
     // const response = await openai.createChatCompletion({
     const response = await openai.audio.transcriptions.create({
       file: file,
-      model: transcribeModel,
+      model: getAITranscribeEngineModel(aiEngineModel),
       language: "it",
       response_format: "verbose_json",
     });
@@ -79,7 +79,8 @@ export type ImageResponse = {
 
 export async function generate(
   apiKey: string,
-  input: string
+  input: string,
+  aiEngineModel: AIImageEngineModel
 ): Promise<ImageResponse|OpenAIApiError> {
   const openai = new OpenAI({
     apiKey: apiKey,
@@ -88,7 +89,7 @@ export async function generate(
 
   try {
     const response = await openai.images.generate({
-      model: generateModel,
+      model: getAIImageEngineModel(aiEngineModel),
       prompt: input,
       n: 1,
       size: "1024x1024",
